@@ -24,9 +24,19 @@
                     <img src="{{ asset('images/logodif.jpg') }}" alt="Logo" style="max-width: 100%; height: 65px;">
                 </div>
 
-                <a href="{{ route('dashboard') }}"
-                    class="{{ request()->routeIs('activos.dashboard') ? 'active-link' : '' }}">
-                    <i class="fas fa-boxes me-2"></i> Activos
+                <a href="{{ route('dashboard') }}" 
+                    class="{{ request()->routeIs('dashboard') ? 'active-link' : '' }}">
+                    <i class="fas fa-home me-2"></i> Inicio
+                </a>
+
+                <a href="{{ route('activos.index') }}"
+                    class="{{ request()->routeIs('activos.index') ? 'active-link' : '' }}">
+                    <i class="fas fa-boxes me-2"></i> Activo fijo
+                </a>
+
+                <a href="{{ route('herramienta-menor.index') }}" 
+                    class="{{ request()->routeIs('herramienta-menor.index') ? 'active-link' : '' }}">
+                    <i class="fas fa-tools"></i> Herramienta Menor
                 </a>
 
                 @canany(['ver usuarios', 'ver permisos'])

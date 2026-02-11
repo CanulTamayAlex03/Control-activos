@@ -14,10 +14,11 @@ use App\Models\CatalogoSubgerencia;
 use App\Models\CatalogoUbr;
 use App\Models\CatalogoEade;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ActivoController extends Controller
 {
-    public function dashboard(Request $request)
+    public function index(Request $request)
     {
         try {
             $totalActivos = Activo::count();
@@ -119,7 +120,7 @@ class ActivoController extends Controller
                 'donaciones' => Activo::where('es_donacion', true)->count(),
             ];
 
-            return view('activos.dashboard', compact(
+            return view('activos.index', compact(
                 'activo',
                 'totalActivos',
                 'activoAnterior',
@@ -169,7 +170,7 @@ class ActivoController extends Controller
                 'ultimoActivo'
             ));
         } catch (\Exception $e) {
-            return redirect()->route('dashboard')
+            return redirect()->route('activos.index')
                 ->with('error', 'Activo no encontrado');
         }
     }
@@ -205,7 +206,7 @@ class ActivoController extends Controller
                 'proximoFolio'
             ));
         } catch (\Exception $e) {
-            return redirect()->route('dashboard')
+            return redirect()->route('activos.index')
                 ->with('error', 'Error al cargar el formulario: ' . $e->getMessage());
         }
     }
@@ -245,7 +246,7 @@ class ActivoController extends Controller
             $validated['status'] = 1;
             $activo = Activo::create($validated);
 
-            return redirect()->route('dashboard', ['id' => $activo->folio])
+            return redirect()->route('activos.index', ['id' => $activo->folio])
                 ->with('success', 'Activo creado exitosamente con folio: ' . $activo->folio);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()
@@ -258,15 +259,13 @@ class ActivoController extends Controller
         }
     }
 
-
     public function search(Request $request)
     {
         try {
             $search = $request->get('search');
 
             if (empty($search)) {
-
-                return redirect()->route('dashboard');
+                return redirect()->route('activos.index');
             }
 
             // Buscar activos que coincidan
@@ -282,8 +281,7 @@ class ActivoController extends Controller
 
             return view('activos.search', compact('activos', 'search'));
         } catch (\Exception $e) {
-
-            return redirect()->route('dashboard')
+            return redirect()->route('activos.index')
                 ->with('error', 'Error en la búsqueda');
         }
     }
@@ -329,7 +327,7 @@ class ActivoController extends Controller
                 'eades'
             ));
         } catch (\Exception $e) {
-            return redirect()->route('dashboard')
+            return redirect()->route('activos.index')
                 ->with('error', 'Activo no encontrado o error al cargar el formulario: ' . $e->getMessage());
         }
     }
@@ -382,5 +380,34 @@ class ActivoController extends Controller
                 ->with('error', 'Error al actualizar el activo: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $activo = Activo::findOrFail($id);
+            $activo->delete();
+
+            return redirect()->route('activos.index')
+                ->with('success', 'Activo eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('activos.index')
+                ->with('error', 'Error al eliminar el activo: ' . $e->getMessage());
+        }
+    }
+
+    public function resguardo($folio)
+    {
+        $activo = Activo::with([
+            'proveedor',
+            'empleado',
+            'departamento',
+            'edificio'
+        ])->findOrFail($folio);
+
+        $pdf = Pdf::loadView('activos.print.resguardo', compact('activo'))
+            ->setPaper('letter', 'portrait');
+
+        return $pdf->stream('resguardo_' . $activo->numero_inventario . '.pdf');
     }
 }

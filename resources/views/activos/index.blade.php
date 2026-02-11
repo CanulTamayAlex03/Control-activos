@@ -4,7 +4,7 @@
 <div class="container-fluid px-0">
 <div class="row align-items-center mb-2 mx-0">
     <div class="col-md-8 px-0">
-        <form action="{{ route('dashboard') }}" method="GET" class="d-flex">
+        <form action="{{ route('activos.index') }}" method="GET" class="d-flex">
             <input type="text" 
                    name="search" 
                    class="form-control form-control-sm rounded-0 rounded-start" 
@@ -15,7 +15,7 @@
                 <i class="fas fa-search"></i>
             </button>
             @if(request('search'))
-            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-secondary ms-1">
+            <a href="{{ route('activos.index') }}" class="btn btn-sm btn-secondary ms-1">
                 <i class="fas fa-times"></i>
             </a>
             @endif
@@ -56,13 +56,16 @@
             </div>
             
             <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-outline-secondary border" title="Imprimir" onclick="window.print()">
-                    <i class="fas fa-print"></i>
-                </button>
-                <a href="{{ route('activos.show', $activo->folio) }}" 
-                   class="btn btn-outline-primary border" title="Vista detallada">
-                    <i class="fas fa-external-link-alt"></i>
+                <a href="{{ route('activos.resguardo', ['folio' => $activo->folio]) }}"
+                   class="btn btn-outline-primary btn-sm border"
+                   target="_blank">
+                   <i class="fas fa-print"></i>
+                    Resguardo
                 </a>
+
+                <button type="button" class="btn btn-outline-secondary border" title="FRM23_activo" onclick="window.print()">
+                    <i class="fas fa-file"></i> FRM23
+                </button>
             </div>
         </div>
 
@@ -185,7 +188,7 @@
                         
                         <div class="col-md-6">
                             <div class="info-row">
-                                <span class="info-label">Fecha Adquisición:</span>
+                                <span class="info-label">Fecha Factura:</span>
                                 <span class="info-value">
                                     {{ $activo->fecha_adquisicion ? $activo->fecha_adquisicion->format('d/m/Y') : '-' }}
                                 </span>
@@ -339,7 +342,7 @@
             <div class="row g-1 align-items-center justify-content-center">
                 <div class="col-auto">
                     @if($primerActivo && $primerActivo->folio !== $activo->folio)
-                    <a href="{{ route('dashboard', ['id' => $primerActivo->folio]) }}" 
+                    <a href="{{ route('activos.index', ['id' => $primerActivo->folio]) }}" 
                        class="btn btn-sm btn-outline-secondary px-2" title="Primer registro">
                         <i class="fas fa-step-backward"></i>
                     </a>
@@ -352,7 +355,7 @@
                 
                 <div class="col-auto">
                     @if($activoAnterior)
-                    <a href="{{ route('dashboard', ['id' => $activoAnterior->folio]) }}" 
+                    <a href="{{ route('activos.index', ['id' => $activoAnterior->folio]) }}" 
                        class="btn btn-sm btn-outline-primary px-3" title="Anterior">
                         <i class="fas fa-chevron-left me-1"></i>Anterior
                     </a>
@@ -371,7 +374,7 @@
                 
                 <div class="col-auto">
                     @if($activoSiguiente)
-                    <a href="{{ route('dashboard', ['id' => $activoSiguiente->folio]) }}" 
+                    <a href="{{ route('activos.index', ['id' => $activoSiguiente->folio]) }}" 
                        class="btn btn-sm btn-outline-primary px-3" title="Siguiente">
                         Siguiente<i class="fas fa-chevron-right ms-1"></i>
                     </a>
@@ -384,7 +387,7 @@
                 
                 <div class="col-auto">
                     @if($ultimoActivo && $ultimoActivo->folio !== $activo->folio)
-                    <a href="{{ route('dashboard', ['id' => $ultimoActivo->folio]) }}" 
+                    <a href="{{ route('activos.index', ['id' => $ultimoActivo->folio]) }}" 
                        class="btn btn-sm btn-outline-secondary px-2" title="Último registro">
                         <i class="fas fa-step-forward"></i>
                     </a>
@@ -521,19 +524,19 @@
     document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('keydown', function(e) {
             if (e.key === 'ArrowLeft' && {{ $activoAnterior ? 'true' : 'false' }}) {
-                window.location.href = "{{ $activoAnterior ? route('dashboard', ['id' => $activoAnterior->folio]) : '#' }}";
+                window.location.href = "{{ $activoAnterior ? route('activos.index', ['id' => $activoAnterior->folio]) : '#' }}";
             }
             
             if (e.key === 'ArrowRight' && {{ $activoSiguiente ? 'true' : 'false' }}) {
-                window.location.href = "{{ $activoSiguiente ? route('dashboard', ['id' => $activoSiguiente->folio]) : '#' }}";
+                window.location.href = "{{ $activoSiguiente ? route('activos.index', ['id' => $activoSiguiente->folio]) : '#' }}";
             }
             
             if (e.key === 'Home' && {{ $primerActivo ? 'true' : 'false' }}) {
-                window.location.href = "{{ $primerActivo ? route('dashboard', ['id' => $primerActivo->folio]) : '#' }}";
+                window.location.href = "{{ $primerActivo ? route('activos.index', ['id' => $primerActivo->folio]) : '#' }}";
             }
             
             if (e.key === 'End' && {{ $ultimoActivo ? 'true' : 'false' }}) {
-                window.location.href = "{{ $ultimoActivo ? route('dashboard', ['id' => $ultimoActivo->folio]) : '#' }}";
+                window.location.href = "{{ $ultimoActivo ? route('activos.index', ['id' => $ultimoActivo->folio]) : '#' }}";
             }
             
             if (e.ctrlKey && e.key === 'f') {

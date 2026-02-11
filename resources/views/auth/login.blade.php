@@ -11,7 +11,7 @@
 
     <style>
         body {
-            background-color: #d6eed6ff;
+            background-color: #b8b7b7;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -48,7 +48,7 @@
         }
 
         .btn-success {
-            background-color: #529c65ff;
+            background: rgb(27, 105, 47);
             border: none;
             padding: 14px;
             font-weight: 600;
@@ -56,7 +56,7 @@
         }
 
         .btn-success:hover {
-            background-color: #67c07dff;
+            background: #1c8b38;
         }
 
         .input-group-text {
