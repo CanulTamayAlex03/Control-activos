@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Control de Activos Fijos</title>
+    <title>Control de Activos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" href="{{ asset('images/icono-herramientas.png') }}" type="image/png">
@@ -29,15 +29,81 @@
                     <i class="fas fa-home me-2"></i> Inicio
                 </a>
 
-                <a href="{{ route('activos.index') }}"
-                    class="{{ request()->routeIs('activos.index') ? 'active-link' : '' }}">
-                    <i class="fas fa-boxes me-2"></i> Activo fijo
+                <a id="toggleActivos"
+                   class="d-flex justify-content-between align-items-center"
+                   href="javascript:void(0);">
+                    <span>
+                        <i class="fas fa-boxes me-2"></i> Activo Fijo
+                    </span>
+                    <i class="fas fa-chevron-down small" id="iconActivos"></i>
                 </a>
 
-                <a href="{{ route('herramienta-menor.index') }}" 
-                    class="{{ request()->routeIs('herramienta-menor.index') ? 'active-link' : '' }}">
-                    <i class="fas fa-tools"></i> Herramienta Menor
+                <div id="menuActivos" style="font-size: 15px;">
+                    <a href="{{ route('activos.index') }}" class="ps-4 d-block">
+                        <i class="fas fa-box me-2"></i> Activo
+                    </a>
+                    <a href="{{ route('activos.activos_tipos') }}" class="ps-4 d-block">
+                        <i class="fas fa-tags me-2"></i> Tipos de Activo
+                    </a>
+                    <a href="{{ route('activos.activos_estatus') }}" class="ps-4 d-block">
+                        <i class="fas fa-toggle-off me-2"></i> Estatus Activos
+                    </a>
+                    <a href="{{ route('activos.activos_reportes') }}" class="ps-4 d-block">
+                        <i class="fas fa-chart-bar me-2"></i> Reportes de Activo Fijo
+                    </a>
+                </div>
+
+                <a id="toggleHerramienta"
+                   class="d-flex justify-content-between align-items-center"
+                   href="javascript:void(0);">
+                    <span>
+                        <i class="fas fa-toolbox me-2"></i> Herramienta Menor
+                    </span>
+                    <i class="fas fa-chevron-down small" id="iconHerramienta"></i>
                 </a>
+
+                <div id="menuHerramienta" style="font-size: 15px;">
+                    <a href="{{ route('herramienta-menor.index') }}" class="ps-4 d-block">
+                        <i class="fas fa-tools me-2"></i> Herramienta Menor
+                    </a>
+                    <a href="{{ route('herramienta-menor.tipos') }}" class="ps-4 d-block">
+                        <i class="fas fa-tags me-2"></i> Tipos de Herramienta
+                    </a>
+                    <a href="{{ route('herramienta-menor.estatus') }}" class="ps-4 d-block">
+                        <i class="fas fa-toggle-off me-2"></i> Estatus Herramienta
+                    </a>
+                    <a href="{{ route('herramienta-menor.reportes') }}" class="ps-4 d-block">
+                        <i class="fas fa-chart-bar me-2"></i> Reportes Herramienta 
+                    </a>
+                </div>
+
+                <a id="toggleCatalogos"
+                   class="d-flex justify-content-between align-items-center"
+                   href="javascript:void(0);">
+                    <span>
+                        <i class="fas fa-folder-open me-2"></i> Catálogos
+                    </span>
+                    <i class="fas fa-chevron-down small" id="iconCatalogos"></i>
+                </a>
+                
+                <div id="menuCatalogos" style="font-size: 15px;">
+                    <a href="{{ route('catalogos.parametros-firmas') }}" class="ps-4 d-block">
+                        <i class="fas fa-signature me-2"></i> Parámetros de firmas
+                    </a>
+                    <a href="{{ route('catalogos.edificios') }}" class="ps-4 d-block">
+                        <i class="fas fa-building me-2"></i> Edificios
+                    </a>
+                    <a href="{{ route('catalogos.departamentos') }}" class="ps-4 d-block">
+                        <i class="fas fa-sitemap me-2"></i> Departamentos
+                    </a>
+                    <a href="{{ route('catalogos.subgerencias') }}" class="ps-4 d-block">
+                        <i class="fas fa-layer-group me-2"></i> Subgerencias
+                    </a>
+                    <a href="{{ route('catalogos.empleados') }}" class="ps-4 d-block">
+                        <i class="fas fa-user-tie me-2"></i> Empleados
+                    </a>
+                </div>
+
 
                 @canany(['ver usuarios', 'ver permisos'])
                 <div class="mt-3 mb-2 px-3">
@@ -80,7 +146,7 @@
                     </button>
 
                     <span class="navbar-brand mb-0 h5">
-                        CONTROL DE ACTIVOS FIJOS
+                        CONTROL DE ACTIVO FIJO
                     </span>
                 </div>
 

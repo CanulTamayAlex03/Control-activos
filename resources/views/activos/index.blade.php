@@ -51,10 +51,12 @@
         <div class="card-header py-1 px-2 bg-light d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <h6 class="mb-0 me-3">
-                    <i class="fas fa-cube me-1"></i>Ficha de Activo
-                </h6>         
+                    <i class="fas fa-cube me-1"></i>Ficha de Activo </h6>   
+                    <strong>{{ $activo->numero_inventario }} </strong>
+                    <span class="text-muted ms-2"> - {{ $activo->descripcion_corta }}</span>
+                      
             </div>
-            
+         
             <div class="btn-group btn-group-sm">
                 <a href="{{ route('activos.resguardo', ['folio' => $activo->folio]) }}"
                    class="btn btn-outline-primary btn-sm border"
@@ -62,75 +64,61 @@
                    <i class="fas fa-print"></i>
                     Resguardo
                 </a>
-
-                <button type="button" class="btn btn-outline-secondary border" title="FRM23_activo" onclick="window.print()">
-                    <i class="fas fa-file"></i> FRM23
-                </button>
+                
+                <a href="{{ route('activos.print.frm23', ['folio' => $activo->folio]) }}"
+                   class="btn btn-outline-secondary btn-sm border"
+                   target="_blank">
+                   <i class="fas fa-file-pdf"></i> FRM23
+                </a>
             </div>
         </div>
-
+ 
         <div class="card-body p-2">
-            <div class="section-card mb-1">
-                <div class="section-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>Información General
-                    </h6>
-                </div>
-                <div class="section-body">
-                    <div class="row g-2">
-                        <div class="col-md-6">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="section-card mb-3">
+                        <div class="section-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Información General
+                            </h6>
+                        </div>
+                        <div class="section-body">
                             <div class="info-row">
                                 <span class="info-label">Folio:</span>
                                 <span class="info-value">
                                     <span class="badge bg-primary">{{ $activo->folio }}</span>
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="info-row">
                                 <span class="info-label"># Inventario:</span>
                                 <span class="info-value fw-bold">{{ $activo->numero_inventario }}</span>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-12">
                             <div class="info-row">
                                 <span class="info-label">Descripción Corta:</span>
                                 <span class="info-value">{{ $activo->descripcion_corta }}</span>
                             </div>
-                        </div>
-                        
-                        @if($activo->descripcion_larga)
-                        <div class="col-md-12">
+                            @if($activo->descripcion_larga)
                             <div class="info-row">
                                 <span class="info-label">Descripción Larga:</span>
                                 <span class="info-value text-muted">{{ $activo->descripcion_larga }}</span>
                             </div>
-                        </div>
-                        @endif
-                        
-                        <div class="col-md-4">
+                            @endif
                             <div class="info-row">
                                 <span class="info-label">Clasificación:</span>
                                 <span class="info-value">{{ $activo->clasificacion->descripcion ?? '-' }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Estado del Bien:</span>
                                 <span class="info-value">
-                                    <span class="badge bg-warning text-dark">{{ $activo->estadoBien->descripcion ?? 'N/A' }}</span>
+                                    <span class="badge bg-warning text-dark">
+                                        {{ $activo->estadoBien->descripcion ?? 'N/A' }}
+                                    </span>
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Rubro:</span>
                                 <span class="info-value">{{ $activo->rubro->descripcion ?? '-' }}</span>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-6">
                             <div class="info-row">
                                 <span class="info-label">Donación/Transferencia:</span>
                                 <span class="info-value">
@@ -145,56 +133,39 @@
                                     @endif
                                 </span>
                             </div>
-                        </div>
-                        
-                        @if($activo->es_donacion && $activo->donante)
-                        <div class="col-md-6">
+                            @if($activo->es_donacion && $activo->donante)
                             <div class="info-row">
                                 <span class="info-label">Donante:</span>
                                 <span class="info-value">{{ $activo->donante }}</span>
                             </div>
+                            @endif
                         </div>
-                        @endif
                     </div>
-                </div>
-            </div>
-
-            <div class="section-card mb-1">
-                <div class="section-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-cogs me-2"></i>Características Físicas
-                    </h6>
-                </div>
-                <div class="section-body">
-                    <div class="row g-2">
-                        <div class="col-md-4">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-cogs me-2"></i>Características Físicas
+                            </h6>
+                        </div>
+                        <div class="section-body">
                             <div class="info-row">
                                 <span class="info-label">Marca:</span>
                                 <span class="info-value">{{ $activo->marca ?: 'SIN MARCA' }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Modelo:</span>
                                 <span class="info-value">{{ $activo->modelo ?: 'SIN MODELO' }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label"># Serie:</span>
                                 <span class="info-value">{{ $activo->numero_serie ?: 'SIN SERIE' }}</span>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-6">
                             <div class="info-row">
                                 <span class="info-label">Fecha Factura:</span>
                                 <span class="info-value">
                                     {{ $activo->fecha_adquisicion ? $activo->fecha_adquisicion->format('d/m/Y') : '-' }}
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="info-row">
                                 <span class="info-label">Fecha Captura:</span>
                                 <span class="info-value">
@@ -204,81 +175,59 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="section-card mb-1">
-                <div class="section-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-shopping-cart me-2"></i>Información de Compra y Almacén
-                    </h6>
-                </div>
-                <div class="section-body">
-                    <div class="row g-2">
-                        <div class="col-md-4">
+                <div class="col-md-6">
+                    <div class="section-card mb-3">
+                        <div class="section-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-shopping-cart me-2"></i>Información de Compra y Almacén
+                            </h6>
+                        </div>
+                        <div class="section-body">
                             <div class="info-row">
                                 <span class="info-label">Proveedor:</span>
                                 <span class="info-value">{{ $activo->proveedor->nomcorto ?? '-' }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Costo:</span>
                                 <span class="info-value text-success fw-bold">
                                     ${{ number_format($activo->costo, 2) }}
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label"># Factura:</span>
                                 <span class="info-value">{{ $activo->numero_factura ?: '-' }}</span>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label"># Pedido:</span>
                                 <span class="info-value">{{ $activo->numero_pedido ?: '-' }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Entrada Almacén:</span>
                                 <span class="info-value">
                                     {{ $activo->entrada_almacen ? $activo->entrada_almacen->format('d/m/Y') : '-' }}
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Salida Almacén:</span>
                                 <span class="info-value">
                                     {{ $activo->salida_almacen ? $activo->salida_almacen->format('d/m/Y') : '-' }}
                                 </span>
                             </div>
-                        </div>
-                        
-                        @if($activo->observaciones)
-                        <div class="col-md-12 mt-1">
+                            @if($activo->observaciones)
                             <div class="info-row">
                                 <span class="info-label">Observaciones:</span>
                                 <span class="info-value text-muted">{{ $activo->observaciones }}</span>
                             </div>
+                            @endif
                         </div>
-                        @endif
                     </div>
-                </div>
-            </div>
-
-            <div class="section-card">
-                <div class="section-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-map-marker-alt me-2"></i>Asignación y Ubicación
-                    </h6>
-                </div>
-                <div class="section-body">
-                    <div class="row g-2">
-                        <div class="col-md-4">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>Asignación y Ubicación
+                            </h6>
+                        </div>
+                        <div class="section-body">
                             <div class="info-row">
                                 <span class="info-label">Empleado:</span>
                                 <span class="info-value">
@@ -292,42 +241,28 @@
                                     @endif
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Fecha Asignación:</span>
                                 <span class="info-value">
                                     {{ $activo->fecha_asignacion ? $activo->fecha_asignacion->format('d/m/Y') : '-' }}
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Edificio:</span>
                                 <span class="info-value">{{ $activo->edificio->descripcion ?? '-' }}</span>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Departamento:</span>
                                 <span class="info-value">{{ $activo->departamento->descripcion ?? '-' }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">Subgerencia:</span>
                                 <span class="info-value">{{ $activo->subgerencia->descripcion ?? '-' }}</span>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">UBR:</span>
                                 <span class="info-value">{{ $activo->ubr->descripcion ?? '-' }}</span>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-4">
                             <div class="info-row">
                                 <span class="info-label">EADE:</span>
                                 <span class="info-value">{{ $activo->eade->descripcion ?? '-' }}</span>
@@ -337,6 +272,7 @@
                 </div>
             </div>
         </div>
+
 
         <div class="card-footer py-1 px-2 bg-light">
             <div class="row g-1 align-items-center justify-content-center">

@@ -28,7 +28,7 @@
             <a href="{{ route('herramienta-menor.index') }}" class="text-decoration-none">
                 <div class="card text-white bg-card h-100 shadow-sm dashboard-card">
                     <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
-                        <i class="fas fa-tools fa-3x mb-3"></i>
+                        <i class="fas fa-toolbox fa-3x mb-3"></i>
                         <h5 class="card-title mb-0">Herramienta Menor</h5>
                     </div>
                 </div>

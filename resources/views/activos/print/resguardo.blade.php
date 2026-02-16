@@ -11,7 +11,7 @@
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'lato', sans-serif;
     font-size: 11px;
     color: #000;
 }

@@ -5,7 +5,7 @@ body {
 
 .sidebar {
     width: 250px;
-    min-height: 100vh;
+    height: 100vh;
     background: rgb(27, 105, 47);
     transition: all 0.3s ease-in-out;
     transform: translateX(-100%);
@@ -13,7 +13,17 @@ body {
     left: 0;
     top: 0;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+.sidebar > div:first-child {
+    flex: 1;
     overflow-y: auto;
+}
+
+.sidebar > div:last-child {
+    flex-shrink: 0;
 }
 
 .sidebar.active {
@@ -24,7 +34,7 @@ body {
 .sidebar a {
     color: #ccc;
     text-decoration: none;
-    padding: 12px 20px;
+    padding: 11px 18px;
     display: block;
     transition: all 0.2s ease;
 }
@@ -32,7 +42,7 @@ body {
 .sidebar a:hover {
     background: #1c8b38;
     color: #fff;
-    padding-left: 25px;
+    padding-left: 23px;
 }
 
 .sidebar a.active-link {
@@ -45,7 +55,6 @@ body {
 
 .sidebar a.active-link:hover {
     background-color: #1a5f31;
-    padding-left: 20px;
 }
 
 .sidebar a.active-link::before {
@@ -61,6 +70,25 @@ body {
 .sidebar a.active-link i {
     color: white;
 }
+
+#menuActivos,
+#menuHerramienta,
+#menuCatalogos
+{
+    display: none;
+    transition: all 0.3s ease;
+}
+
+#menuActivos.show-menu,
+#menuHerramienta.show-menu,
+#menuCatalogos.show-menu {
+    display: block;
+}
+
+.rotate {
+    transform: rotate(180deg);
+}
+
 
 .content-wrapper {
     flex: 1;
@@ -195,4 +223,54 @@ body {
 main {
     position: relative;
     z-index: 1;
+}
+
+
+/* ===== FICHA DE ACTIVO ===== */
+
+.section-card {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.section-header {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.section-header h6 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+
+.section-body {
+    padding: 12px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.info-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #555;
+}
+
+.info-value {
+    font-size: 13px;
+    color: #333;
+    word-break: break-word;
+}
+
+.badge {
+    font-size: 11px;
+    padding: 4px 6px;
 }

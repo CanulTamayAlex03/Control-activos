@@ -410,4 +410,20 @@ class ActivoController extends Controller
 
         return $pdf->stream('resguardo_' . $activo->numero_inventario . '.pdf');
     }
+
+    public function printFrm23($folio)
+    {
+        $activo = Activo::with([
+            'proveedor',
+            'empleado',
+            'departamento',
+            'edificio'
+        ])->findOrFail($folio);
+
+        $pdf = Pdf::loadView('activos.print.frm23', compact('activo'))
+            ->setPaper('letter', 'portrait');
+
+        return $pdf->stream('FRM23_' . $activo->numero_inventario . '.pdf');
+    }
+
 }

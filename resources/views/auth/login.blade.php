@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Activos Fijos</title>
+    <title>Control de Activos</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="shortcut icon" href="{{ asset('images/icono-herramientas.png') }}" type="image/png">
     <link rel="icon" href="{{ asset('images/icono-herramientas.png') }}" type="image/png">
