@@ -17,12 +17,8 @@ class CatalogoEmpleado extends Model
         'no_nomi',
         'id_depto',
         'id_edif',
-        'status',
     ];
 
-    protected $casts = [
-        'status' => 'boolean',
-    ];
 
     public function departamento()
     {

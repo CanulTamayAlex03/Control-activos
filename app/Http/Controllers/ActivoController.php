@@ -10,7 +10,7 @@ use App\Models\CatalogoProveedor;
 use App\Models\CatalogoEmpleado;
 use App\Models\CatalogoEdificio;
 use App\Models\CatalogoDepartamento;
-use App\Models\CatalogoSubgerencia;
+use App\Models\CatalogoDirecciones;
 use App\Models\CatalogoUbr;
 use App\Models\CatalogoEade;
 use Illuminate\Http\Request;
@@ -35,7 +35,7 @@ class ActivoController extends Controller
                     'empleado',
                     'edificio',
                     'departamento',
-                    'subgerencia',
+                    'direccion',
                     'ubr',
                     'eade'
                 ])->where(function ($query) use ($searchTerm) {
@@ -54,7 +54,7 @@ class ActivoController extends Controller
                         'empleado',
                         'edificio',
                         'departamento',
-                        'subgerencia',
+                        'direccion',
                         'ubr',
                         'eade'
                     ])->first();
@@ -72,7 +72,7 @@ class ActivoController extends Controller
                     'empleado',
                     'edificio',
                     'departamento',
-                    'subgerencia',
+                    'direccion',
                     'ubr',
                     'eade'
                 ])->find($activoId);
@@ -86,7 +86,7 @@ class ActivoController extends Controller
                         'empleado',
                         'edificio',
                         'departamento',
-                        'subgerencia',
+                        'direccion',
                         'ubr',
                         'eade'
                     ])->first();
@@ -146,7 +146,7 @@ class ActivoController extends Controller
                 'empleado',
                 'edificio',
                 'departamento',
-                'subgerencia',
+                'direccion',
                 'ubr',
                 'eade'
             ])->findOrFail($id);
@@ -185,7 +185,7 @@ class ActivoController extends Controller
             $empleados = CatalogoEmpleado::orderBy('nombre')->get();
             $edificios = CatalogoEdificio::orderBy('descripcion')->get();
             $departamentos = CatalogoDepartamento::orderBy('descripcion')->get();
-            $subgerencias = CatalogoSubgerencia::orderBy('descripcion')->get();
+            $direcciones = CatalogoDirecciones::orderBy('descripcion')->get();
             $ubrs = CatalogoUbr::orderBy('descripcion')->get();
             $eades = CatalogoEade::orderBy('descripcion')->get();
 
@@ -200,7 +200,7 @@ class ActivoController extends Controller
                 'empleados',
                 'edificios',
                 'departamentos',
-                'subgerencias',
+                'direcciones',
                 'ubrs',
                 'eades',
                 'proximoFolio'
@@ -238,7 +238,7 @@ class ActivoController extends Controller
                 'fecha_asignacion' => 'nullable|date',
                 'edificio_id'      => 'nullable|exists:catalogo_edificio,id',
                 'departamento_id' => 'nullable|exists:catalogo_departamento,id',
-                'subgerencia_id' => 'nullable|exists:catalogo_subgerencia,id',
+                'direccion_id' => 'nullable|exists:catalogo_direcciones,id',
                 'ubr_id' => 'nullable|exists:catalogo_ubr,id',
                 'eade_id' => 'nullable|exists:catalogo_eade,id',
             ]);
@@ -297,7 +297,7 @@ class ActivoController extends Controller
                 'empleado',
                 'edificio',
                 'departamento',
-                'subgerencia',
+                'direccion',
                 'ubr',
                 'eade'
             ])->findOrFail($id);
@@ -309,7 +309,7 @@ class ActivoController extends Controller
             $empleados = CatalogoEmpleado::orderBy('nombre')->get();
             $edificios = CatalogoEdificio::orderBy('descripcion')->get();
             $departamentos = CatalogoDepartamento::orderBy('descripcion')->get();
-            $subgerencias = CatalogoSubgerencia::orderBy('descripcion')->get();
+            $direcciones = CatalogoDirecciones::orderBy('descripcion')->get();
             $ubrs = CatalogoUbr::orderBy('descripcion')->get();
             $eades = CatalogoEade::orderBy('descripcion')->get();
 
@@ -322,7 +322,7 @@ class ActivoController extends Controller
                 'empleados',
                 'edificios',
                 'departamentos',
-                'subgerencias',
+                'direcciones',
                 'ubrs',
                 'eades'
             ));
@@ -361,7 +361,7 @@ class ActivoController extends Controller
                 'fecha_asignacion' => 'nullable|date',
                 'edificio_id'      => 'nullable|exists:catalogo_edificio,id',
                 'departamento_id' => 'nullable|exists:catalogo_departamento,id',
-                'subgerencia_id' => 'nullable|exists:catalogo_subgerencia,id',
+                'direccion_id' => 'nullable|exists:catalogo_direcciones,id',
                 'ubr_id' => 'nullable|exists:catalogo_ubr,id',
                 'eade_id' => 'nullable|exists:catalogo_eade,id',
                 'status' => 'boolean',

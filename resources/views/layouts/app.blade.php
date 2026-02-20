@@ -96,8 +96,8 @@
                     <a href="{{ route('catalogos.departamentos') }}" class="ps-4 d-block">
                         <i class="fas fa-sitemap me-2"></i> Departamentos
                     </a>
-                    <a href="{{ route('catalogos.subgerencias') }}" class="ps-4 d-block">
-                        <i class="fas fa-layer-group me-2"></i> Subgerencias
+                    <a href="{{ route('catalogos.direcciones') }}" class="ps-4 d-block">
+                        <i class="fas fa-city me-2"></i> Direcciones
                     </a>
                     <a href="{{ route('catalogos.empleados') }}" class="ps-4 d-block">
                         <i class="fas fa-user-tie me-2"></i> Empleados

@@ -21,7 +21,7 @@ class ParametroController extends Controller
             });
         }
 
-        $parametros = $query->paginate(10);
+        $parametros = $query->paginate(20);
 
         return view('catalogos.parametros-firmas', compact('parametros'));
     }

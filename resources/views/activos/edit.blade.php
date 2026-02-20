@@ -474,16 +474,16 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="info-row">
-                                    <label class="info-label" for="subgerencia_id">Subgerencia:</label>
+                                    <label class="info-label" for="direccion_id">Dirección:</label>
                                     <div class="info-value">
-                                        <select name="subgerencia_id" 
-                                                id="subgerencia_id"
+                                        <select name="direccion_id" 
+                                                id="direccion_id"
                                                 class="form-select form-select-sm">
                                             <option value="">Seleccionar...</option>
-                                            @foreach($subgerencias as $subgerencia)
-                                                <option value="{{ $subgerencia->id }}"
-                                                    {{ old('subgerencia_id', $activo->subgerencia_id) == $subgerencia->id ? 'selected' : '' }}>
-                                                    {{ $subgerencia->descripcion }}
+                                            @foreach($direcciones as $direccion)
+                                                <option value="{{ $direccion->id }}"
+                                                    {{ old('direccion_id', $activo->direccion_id) == $direccion->id ? 'selected' : '' }}>
+                                                    {{ $direccion->descripcion }}
                                                 </option>
                                             @endforeach
                                         </select>

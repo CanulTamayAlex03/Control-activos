@@ -7,6 +7,9 @@ use App\Http\Controllers\Admin\PermisosController;
 use App\Http\Controllers\ActivoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ParametroController;
+use App\Http\Controllers\EdificioController;
+use App\Http\Controllers\EmpleadoController;
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -78,17 +81,19 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/parametros-firmas', [ParametroController::class, 'store'])->name('parametros-firmas.store');
         Route::put('/parametros-firmas/{id}', [ParametroController::class, 'update'])->name('parametros-firmas.update');
 
-        Route::get('/edificios', fn() => view('catalogos.edificios'))
-            ->name('edificios');
+        Route::get('/edificios', [EdificioController::class, 'index'])->name('edificios');
+        Route::post('/edificios', [EdificioController::class, 'store'])->name('edificios.store');
+        Route::put('/edificios/{id}', [EdificioController::class, 'update'])->name('edificios.update');
 
         Route::get('/departamentos', fn() => view('catalogos.departamentos'))
             ->name('departamentos');
 
-        Route::get('/subgerencias', fn() => view('catalogos.subgerencias'))
-            ->name('subgerencias');
+        Route::get('/direcciones', fn() => view('catalogos.direcciones'))
+            ->name('direcciones');
 
-        Route::get('/empleados', fn() => view('catalogos.empleados'))
-            ->name('empleados');
+        Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados');
+        Route::post('/empleados', [EmpleadoController::class, 'store'])->name('empleados.store');
+        Route::put('/empleados/{id}', [EmpleadoController::class, 'update'])->name('empleados.update');
     });
 
 

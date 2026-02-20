@@ -38,7 +38,7 @@ class Activo extends Model
         'empleado_id',
         'edificio_id',
         'departamento_id',
-        'subgerencia_id',
+        'direccion_id',
         'ubr_id',
         'eade_id',
         'fecha_asignacion',
@@ -101,9 +101,9 @@ class Activo extends Model
     }
 
 
-    public function subgerencia()
+    public function direccion()
     {
-        return $this->belongsTo(CatalogoSubgerencia::class, 'subgerencia_id');
+        return $this->belongsTo(CatalogoDirecciones::class, 'direccion_id');
     }
 
 

@@ -14,11 +14,6 @@ class CatalogoEdificio extends Model
 
     protected $fillable = [
         'descripcion',
-        'status',
-    ];
-
-    protected $casts = [
-        'status' => 'boolean',
     ];
 
     public function activos()

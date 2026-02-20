@@ -256,8 +256,8 @@
                                 <span class="info-value">{{ $activo->departamento->descripcion ?? '-' }}</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Subgerencia:</span>
-                                <span class="info-value">{{ $activo->subgerencia->descripcion ?? '-' }}</span>
+                                <span class="info-label">Dirección:</span>
+                                <span class="info-value">{{ $activo->direccion->descripcion ?? '-' }}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">UBR:</span>
