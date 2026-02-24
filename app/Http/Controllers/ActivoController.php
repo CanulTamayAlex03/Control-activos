@@ -13,8 +13,10 @@ use App\Models\CatalogoDepartamento;
 use App\Models\CatalogoDirecciones;
 use App\Models\CatalogoUbr;
 use App\Models\CatalogoEade;
+use App\Models\Parametro;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class ActivoController extends Controller
 {
@@ -22,6 +24,8 @@ class ActivoController extends Controller
     {
         try {
             $totalActivos = Activo::count();
+
+            $parametrosFirmas = Parametro::all();
 
             $activo = null;
             $searchTerm = $request->get('search');
@@ -127,7 +131,8 @@ class ActivoController extends Controller
                 'activoSiguiente',
                 'estadisticas',
                 'primerActivo',
-                'ultimoActivo'
+                'ultimoActivo',
+                'parametrosFirmas'
             ))->with('searchTerm', $searchTerm);
         } catch (\Exception $e) {
             return redirect()->route('dashboard')
@@ -175,9 +180,28 @@ class ActivoController extends Controller
         }
     }
 
-    public function create()
+    public function create($tipo = null)
     {
         try {
+
+            if (!$tipo || !in_array($tipo, ['BM', 'BV', 'BVA'])) {
+                return redirect()->route('activos.index')
+                    ->with('error', 'Debe seleccionar un tipo de activo.');
+            }
+
+            $ultimo = Activo::where('numero_inventario', 'like', $tipo . '%')
+                ->orderBy('numero_inventario', 'desc')
+                ->first();
+
+            if ($ultimo) {
+                $numero = (int) substr($ultimo->numero_inventario, strlen($tipo));
+                $siguiente = $numero + 1;
+            } else {
+                $siguiente = 1;
+            }
+
+            $siguienteNumeroInventario = $tipo . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
+
             $clasificaciones = CatalogoClasificacion::orderBy('descripcion')->get();
             $estadosBien = CatalogoEstadoBien::orderBy('descripcion')->get();
             $rubros = CatalogoRubro::orderBy('descripcion')->get();
@@ -188,9 +212,6 @@ class ActivoController extends Controller
             $direcciones = CatalogoDirecciones::orderBy('descripcion')->get();
             $ubrs = CatalogoUbr::orderBy('descripcion')->get();
             $eades = CatalogoEade::orderBy('descripcion')->get();
-
-            $ultimoFolio = Activo::max('folio');
-            $proximoFolio = $ultimoFolio ? $ultimoFolio + 1 : 1;
 
             return view('activos.create', compact(
                 'clasificaciones',
@@ -203,7 +224,8 @@ class ActivoController extends Controller
                 'direcciones',
                 'ubrs',
                 'eades',
-                'proximoFolio'
+                'tipo',
+                'siguienteNumeroInventario'
             ));
         } catch (\Exception $e) {
             return redirect()->route('activos.index')
@@ -213,9 +235,12 @@ class ActivoController extends Controller
 
     public function store(Request $request)
     {
+        DB::beginTransaction();
+
         try {
-            $validated = $request->validate([
-                'numero_inventario' => 'required|unique:activos,numero_inventario',
+
+            $request->validate([
+                'tipo_activo' => 'required|in:BM,BV,BVA',
                 'descripcion_corta' => 'required|string|max:255',
                 'descripcion_larga' => 'nullable|string',
                 'clasificacion_id' => 'required|exists:catalogo_clasificacion,id',
@@ -243,16 +268,36 @@ class ActivoController extends Controller
                 'eade_id' => 'nullable|exists:catalogo_eade,id',
             ]);
 
-            $validated['status'] = 1;
-            $activo = Activo::create($validated);
+            $prefijo = $request->tipo_activo;
+
+            $ultimo = Activo::where('numero_inventario', 'like', $prefijo . '%')
+                ->lockForUpdate()
+                ->orderBy('numero_inventario', 'desc')
+                ->first();
+
+            if ($ultimo) {
+                $numero = (int) substr($ultimo->numero_inventario, strlen($prefijo));
+                $siguiente = $numero + 1;
+            } else {
+                $siguiente = 1;
+            }
+
+            $numeroInventario = $prefijo . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
+
+            $data = $request->except('tipo_activo');
+            $data['numero_inventario'] = $numeroInventario;
+            $data['status'] = 1;
+
+            $activo = Activo::create($data);
+
+            DB::commit();
 
             return redirect()->route('activos.index', ['id' => $activo->folio])
-                ->with('success', 'Activo creado exitosamente con folio: ' . $activo->folio);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()
-                ->withErrors($e->errors())
-                ->withInput();
+                ->with('success', 'Activo creado con número: ' . $numeroInventario);
         } catch (\Exception $e) {
+
+            DB::rollBack();
+
             return redirect()->back()
                 ->with('error', 'Error al crear el activo: ' . $e->getMessage())
                 ->withInput();
@@ -396,19 +441,41 @@ class ActivoController extends Controller
         }
     }
 
-    public function resguardo($folio)
+    public function resguardo(Request $request, $folio)
     {
+        $request->validate([
+            'autorizo' => 'required|string|max:255',
+            'visto_bueno_id' => 'required|exists:parametros,id'
+        ]);
+
         $activo = Activo::with([
             'proveedor',
             'empleado',
             'departamento',
-            'edificio'
+            'edificio',
+            'estadoBien'
         ])->findOrFail($folio);
 
-        $pdf = Pdf::loadView('activos.print.resguardo', compact('activo'))
+        $vistoBueno = Parametro::findOrFail($request->visto_bueno_id);
+
+        $data = [
+            'activo' => $activo,
+            'autorizo' => $request->autorizo,
+            'visto_bueno_nombre' => $vistoBueno->nombre_completo
+        ];
+
+        $pdf = Pdf::loadView('activos.print.resguardo', $data)
             ->setPaper('letter', 'portrait');
 
         return $pdf->stream('resguardo_' . $activo->numero_inventario . '.pdf');
+    }
+
+    public function mostrarModalResguardo($folio)
+    {
+        $activo = Activo::findOrFail($folio);
+        $parametrosFirmas = Parametro::all();
+
+        return view('activos.modales.resguardo-modal', compact('activo', 'parametrosFirmas'));
     }
 
     public function printFrm23($folio)
@@ -419,11 +486,13 @@ class ActivoController extends Controller
             'departamento',
             'edificio'
         ])->findOrFail($folio);
-
-        $pdf = Pdf::loadView('activos.print.frm23', compact('activo'))
-            ->setPaper('letter', 'portrait');
-
+        $elaboro = Parametro::find(2);
+        $vobo    = Parametro::find(3);
+        $pdf = Pdf::loadView('activos.print.frm23', compact(
+            'activo',
+            'elaboro',
+            'vobo'
+        ))->setPaper('letter', 'portrait');
         return $pdf->stream('FRM23_' . $activo->numero_inventario . '.pdf');
     }
-
 }

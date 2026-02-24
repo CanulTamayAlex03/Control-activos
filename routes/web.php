@@ -9,6 +9,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ParametroController;
 use App\Http\Controllers\EdificioController;
 use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\DireccionesController;
+use App\Http\Controllers\DepartamentoController;
 
 
 Route::get('/', function () {
@@ -37,10 +39,16 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/search', [ActivoController::class, 'search'])->name('search');
 
-        Route::get(
+        Route::post(
             '/{folio}/resguardo',
             [ActivoController::class, 'resguardo']
         )->name('resguardo');
+
+
+        Route::get(
+            '/{folio}/modal-resguardo',
+            [ActivoController::class, 'mostrarModalResguardo']
+        )->name('modal-resguardo');
 
         Route::get(
             '/{folio}/print/frm23',
@@ -52,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}', [ActivoController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [ActivoController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ActivoController::class, 'update'])->name('update');
+        Route::get('/create/{tipo}', [ActivoController::class, 'create'])->name('create.tipo');
     });
 
     Route::prefix('herramienta-menor')
@@ -85,11 +94,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/edificios', [EdificioController::class, 'store'])->name('edificios.store');
         Route::put('/edificios/{id}', [EdificioController::class, 'update'])->name('edificios.update');
 
-        Route::get('/departamentos', fn() => view('catalogos.departamentos'))
-            ->name('departamentos');
+        Route::get('/departamentos', [DepartamentoController::class, 'index'])->name('departamentos');
+        Route::post('/departamentos', [DepartamentoController::class, 'store'])->name('departamentos.store');
+        Route::put('/departamentos/{id}', [DepartamentoController::class, 'update'])->name('departamentos.update');
 
-        Route::get('/direcciones', fn() => view('catalogos.direcciones'))
-            ->name('direcciones');
+        Route::get('/direcciones', [DireccionesController::class, 'index'])->name('direcciones');
+        Route::post('/direcciones', [DireccionesController::class, 'store'])->name('direcciones.store');
+        Route::put('/direcciones/{id}', [DireccionesController::class, 'update'])->name('direcciones.update');
 
         Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados');
         Route::post('/empleados', [EmpleadoController::class, 'store'])->name('empleados.store');

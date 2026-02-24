@@ -187,9 +187,9 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/layout.js') }}"></script>
 
-    @yield('scripts')
     @stack('modals')
-
+    @stack('scripts')
+    @yield('scripts')
 </body>
 
 </html>

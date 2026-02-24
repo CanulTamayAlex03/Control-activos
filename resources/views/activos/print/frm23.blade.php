@@ -183,7 +183,7 @@ body {
         Elaboró
         
         <div class="firma-linea">
-            TSU. CARLOS ALBERTO QUINTAL ROSADO<br>
+            {{ $elaboro->nombre_completo }}<br>
             Responsable de Control de Activos Fijos
         </div>
     </div>
@@ -191,7 +191,7 @@ body {
     <div class="firma-bloque">
         Vo.Bo.
         <div class="firma-linea">
-            L.A. SHARA ELENA ROMERO CRUZ<br>
+            {{ $vobo->nombre_completo }}<br>
             Jefa de Depto. de Recursos Materiales,
             Control Vehicular y Almacén
         </div>

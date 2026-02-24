@@ -34,9 +34,12 @@
         </a>
         @endcan
         @can ('crear activos')
-        <a href="{{ route('activos.create') }}" class="btn btn-success btn-sm me-2">
+        <button type="button" 
+                class="btn btn-success btn-sm me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#tipoActivoModal">
             <i class="fas fa-plus me-1"></i> Nuevo
-        </a>
+        </button>
         @endcan
 
         <span class="badge bg-light text-dark border small">
@@ -58,12 +61,13 @@
             </div>
          
             <div class="btn-group btn-group-sm">
-                <a href="{{ route('activos.resguardo', ['folio' => $activo->folio]) }}"
-                   class="btn btn-outline-primary btn-sm border"
-                   target="_blank">
-                   <i class="fas fa-print"></i>
-                    Resguardo
-                </a>
+                <button type="button" 
+                        class="btn btn-sm btn-outline-primary" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#resguardoModal"
+                        data-activo-id="{{ $activo->folio }}">
+                    <i class="fas fa-file-pdf"></i> Resguardo
+                </button>
                 
                 <a href="{{ route('activos.print.frm23', ['folio' => $activo->folio]) }}"
                    class="btn btn-outline-secondary btn-sm border"
@@ -74,9 +78,9 @@
         </div>
  
         <div class="card-body p-2">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="section-card mb-3">
+            <div class="row g-3 align-items-stretch">
+                <div class="col-md-6 d-flex">
+                    <div class="section-card w-100">
                         <div class="section-header">
                             <h6 class="mb-0">
                                 <i class="fas fa-info-circle me-2"></i>Información General
@@ -141,7 +145,10 @@
                             @endif
                         </div>
                     </div>
-                    <div class="section-card">
+                    
+                </div>
+                <div class="col-md-6 d-flex">
+                    <div class="section-card w-100">
                         <div class="section-header">
                             <h6 class="mb-0">
                                 <i class="fas fa-cogs me-2"></i>Características Físicas
@@ -175,8 +182,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="section-card mb-3">
+                <div class="col-md-6 d-flex">
+                    <div class="section-card w-100">
                         <div class="section-header">
                             <h6 class="mb-0">
                                 <i class="fas fa-shopping-cart me-2"></i>Información de Compra y Almacén
@@ -221,7 +228,10 @@
                             @endif
                         </div>
                     </div>
-                    <div class="section-card">
+                    
+                </div>
+                <div class="col-md-6 d-flex">
+                    <div class="section-card w-100">
                         <div class="section-header">
                             <h6 class="mb-0">
                                 <i class="fas fa-map-marker-alt me-2"></i>Asignación y Ubicación
@@ -344,6 +354,10 @@
     </div>
     @endif
 </div>
+@push('modals')
+    @include('activos.modales.resguardo-modal')
+    @include('activos.modales.tipo_activo-modal')
+@endpush
 
 <style>
     .container-fluid {

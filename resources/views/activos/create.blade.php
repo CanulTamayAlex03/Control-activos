@@ -9,7 +9,7 @@
             </h5>
         </div>
         <div class="col-md-4 text-end px-0">
-            <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-sm">
+            <a href="{{ route('activos.index') }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left me-1"></i> Cancelar
             </a>
         </div>
@@ -50,17 +50,21 @@
                     <div class="section-body">
                         <div class="row g-2">
 
+                            <input type="hidden" name="tipo_activo" value="{{ $tipo }}">
+
                             <div class="col-md-6">
                                 <div class="info-row">
-                                    <label class="info-label" for="numero_inventario"># Inventario:</label>
+                                    <label class="info-label"># Inventario:</label>
                                     <div class="info-value">
                                         <input type="text" 
-                                               name="numero_inventario" 
-                                               id="numero_inventario"
-                                               class="form-control form-control-sm"
-                                               value="{{ old('numero_inventario') }}"
-                                               required
-                                               placeholder="Ej: INV-2024-001">
+                                               class="form-control form-control-sm bg-light"
+                                               value="{{ $siguienteNumeroInventario ?? 'No disponible' }}"
+                                               readonly
+                                               style="font-weight: bold; color: #212529;">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Este número se asignará automáticamente al guardar
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -529,7 +533,7 @@
                         <i class="fas fa-redo me-1"></i> Limpiar
                     </button>
                     <div>
-                        <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-sm me-2">
+                        <a href="{{ route('activos.index') }}" class="btn btn-secondary btn-sm me-2">
                             <i class="fas fa-times me-1"></i> Cancelar
                         </a>
                         <button type="submit" class="btn btn-success btn-sm">

@@ -16,6 +16,12 @@ class CatalogoDirecciones extends Model
         'descripcion',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+        'status' => 'boolean',
+    ];
 
     public function activos()
     {

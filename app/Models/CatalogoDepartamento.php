@@ -15,16 +15,25 @@ class CatalogoDepartamento extends Model
     protected $fillable = [
         'descripcion',
         'id_edif',
+        'direccion_id',
         'status',
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function edificio()
     {
         return $this->belongsTo(CatalogoEdificio::class, 'id_edif');
+    }
+
+    public function direccion()
+    {
+        return $this->belongsTo(CatalogoDirecciones::class, 'direccion_id');
     }
 
     public function activos()

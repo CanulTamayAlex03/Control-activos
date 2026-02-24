@@ -265,8 +265,8 @@ td {
         <th class="label">Responsable del bien</th>
     </tr>
     <tr>
-        <td>{{ $activo->edificio->descripcion }}</td>
-        <td>{{ $activo->empleado->nombre ?? '' }}</td>
+        <td>{{ $activo->edificio->descripcion ?? 'No especificado'}}</td>
+        <td>{{ $activo->empleado->nombre ?? 'No especificado' }}</td>
     </tr>
 </table>
 
@@ -317,18 +317,18 @@ td {
     </tr>
     <tr>
         <td>
-            <div class="nombre">Nombre</div>
+            <div class="nombre">Nombre: <br> {{ $activo->empleado->nombre ?? 'No especificado'}}</div> 
             <div class="puesto">Puesto</div>
             <div class="firma-linea">Firma _______________________________</div>
         </td>
         <td>
-            <div class="nombre">Nombre</div>
-            <div class="puesto" style="color: #ffffff;">h</div>
+            <div class="nombre">Nombre: <br> {{ $autorizo ?? '' }}</div>
+            <div class="puesto">Puesto: Jefe de Área</div>
             <div class="firma-linea">Firma _______________________________</div>
         </td>
         <td>
-            <div class="responsable">Nombre</div>
-            <div class="responsable-nombre">C.P. José Fernando Rojas Zavala </div>
+            <div class="nombre">Nombre: <br> {{ $visto_bueno_nombre ?? '' }}</div>
+            <div class="puesto">Puesto: Dirección Administrativa</div>
             <div class="firma-linea">Firma _______________________________</div>
         </td>
     </tr>
