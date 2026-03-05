@@ -55,12 +55,14 @@
             const nombre_completo = $(this).data('nombre_completo');
             const descripcion = $(this).data('descripcion');
             const formato = $(this).data('formato');
+            const valor_uma = $(this).data('valor_uma');
             const active = $(this).data('active');
 
             $('#edit_id').val(id);
             $('#edit_nombre_completo').val(nombre_completo);
             $('#edit_descripcion').val(descripcion);
             $('#edit_formato').val(formato);
+            $('#edit_valor_uma').val(valor_uma);
 
             if (active == 1 || active === '1') {
                 $('#edit_active').prop('checked', true);
@@ -86,6 +88,7 @@
                 nombre_completo: $('#edit_nombre_completo').val(),
                 descripcion: $('#edit_descripcion').val(),
                 formato: $('#edit_formato').val(),
+                valor_uma: $('#edit_valor_uma').val(),
                 active: $('#edit_active').is(':checked') ? '1' : '0'
             };
 

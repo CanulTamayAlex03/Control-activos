@@ -96,45 +96,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="col-md-4">
-                                <div class="info-row">
-                                    <label class="info-label" for="clasificacion_id">Clasificación:</label>
-                                    <div class="info-value">
-                                        <select name="clasificacion_id" 
-                                                id="clasificacion_id"
-                                                class="form-select form-select-sm"
-                                                required>
-                                            <option value="">Seleccionar...</option>
-                                            @foreach($clasificaciones as $clasificacion)
-                                                <option value="{{ $clasificacion->id }}" 
-                                                    {{ old('clasificacion_id') == $clasificacion->id ? 'selected' : '' }}>
-                                                    {{ $clasificacion->descripcion }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="info-row">
-                                    <label class="info-label" for="estado_bien_id">Estado del Bien:</label>
-                                    <div class="info-value">
-                                        <select name="estado_bien_id" 
-                                                id="estado_bien_id"
-                                                class="form-select form-select-sm"
-                                                required>
-                                            <option value="">Seleccionar...</option>
-                                            @foreach($estadosBien as $estado)
-                                                <option value="{{ $estado->id }}"
-                                                    {{ old('estado_bien_id') == $estado->id ? 'selected' : '' }}>
-                                                    {{ $estado->descripcion }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="col-md-4">
                                 <div class="info-row">
                                     <label class="info-label" for="rubro_id">Rubro:</label>
@@ -148,6 +110,57 @@
                                                 <option value="{{ $rubro->id }}"
                                                     {{ old('rubro_id') == $rubro->id ? 'selected' : '' }}>
                                                     {{ $rubro->descripcion }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" id="subrubro-group" style="display:block;">
+                                <div class="info-row">
+                                    <label class="info-label" for="subrubro_id">Subrubro:</label>
+                                    <div class="info-value">
+                                        <select name="subrubro_id" 
+                                                id="subrubro_id"
+                                                class="form-select form-select-sm">
+                                            <option value="">Seleccionar...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" id="clasificacion-group" style="display:none;">
+                                <div class="info-row">
+                                    <label class="info-label" for="clasificacion_id">Clasificación:</label>
+                                    <div class="info-value">
+                                        <select name="clasificacion_id" 
+                                                id="clasificacion_id"
+                                                class="form-select form-select-sm">
+                                            <option value="">Seleccionar...</option>
+                                            @foreach($clasificaciones as $clasificacion)
+                                                <option value="{{ $clasificacion->id }}" 
+                                                    {{ old('clasificacion_id') == $clasificacion->id ? 'selected' : '' }}>
+                                                    {{ $clasificacion->descripcion }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <label class="info-label" for="estado_bien_id">Estado del Bien:</label>
+                                    <div class="info-value">
+                                        <select name="estado_bien_id" 
+                                                id="estado_bien_id"
+                                                class="form-select form-select-sm"
+                                                required>
+                                            <option value="">Seleccionar...</option>
+                                            @foreach($estadosBien as $estado)
+                                                <option value="{{ $estado->id }}"
+                                                    {{ old('estado_bien_id') == $estado->id ? 'selected' : '' }}>
+                                                    {{ $estado->descripcion }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -261,14 +274,12 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="info-row">
-                                    <label class="info-label">Fecha Captura:</label>
+                                    <label class="info-label" for="fecha_registro">Fecha Registro</label>
                                     <div class="info-value">
-                                        <input type="text" 
+                                        <input type="date" 
+                                               name="fecha_registro"
                                                class="form-control form-control-sm"
-                                               value="{{ now()->format('d/m/Y') }}"
-                                               readonly
-                                               style="background-color: #e9ecef;">
-                                        <small class="text-muted">Fecha actual del sistema</small>
+                                               value="{{ old('fecha_registro') }}">
                                     </div>
                                 </div>
                             </div>
@@ -357,6 +368,19 @@
                                                id="entrada_almacen"
                                                class="form-control form-control-sm"
                                                value="{{ old('entrada_almacen') }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-row">
+                                    <label class="info-label" for="folio_entrada">Folio Entrada:</label>
+                                    <div class="info-value">
+                                        <input type="text" 
+                                               name="folio_entrada" 
+                                               id="folio_entrada"
+                                               class="form-control form-control-sm"
+                                               value="{{ old('folio_entrada') }}"
+                                               placeholder="Ej: FE-2024-001">
                                     </div>
                                 </div>
                             </div>
@@ -506,7 +530,7 @@
                             
                             <div class="col-md-4">
                                 <div class="info-row">
-                                    <label class="info-label" for="eade_id">EADE:</label>
+                                    <label class="info-label" for="eade_id">EAD:</label>
                                     <div class="info-value">
                                         <select name="eade_id" 
                                                 id="eade_id"
@@ -652,7 +676,86 @@
         const esDonacionNo = document.getElementById('es_donacion_no');
         const donanteField = document.getElementById('donante-field');
         const donanteInput = document.getElementById('donante');
+
+        const rubroSelect = document.getElementById('rubro_id');
+        const subrubroGroup = document.getElementById('subrubro-group');
+        const subrubroSelect = document.getElementById('subrubro_id');
+        const clasificacionGroup = document.getElementById('clasificacion-group');
+        const clasificacionSelect = document.getElementById('clasificacion_id');
         
+        // Variable para almacenar los subrubros cargados
+        let subrubros = [];
+
+        // Función para cargar subrubros según el rubro seleccionado
+        function cargarSubrubros(rubroId) {
+            if (!rubroId) {
+                subrubroGroup.style.display = 'none';
+                subrubroSelect.innerHTML = '<option value="">Seleccionar...</option>';
+                subrubroSelect.removeAttribute('required');
+                return;
+            }
+
+            // Mostrar el grupo de subrubros
+            subrubroGroup.style.display = 'block';
+            
+            // Limpiar opciones actuales
+            subrubroSelect.innerHTML = '<option value="">Cargando...</option>';
+            
+            // Hacer petición AJAX para obtener los subrubros del rubro seleccionado
+            fetch(`/activos/subrubros-por-rubro/${rubroId}`)
+                .then(response => response.json())
+                .then(data => {
+                    subrubros = data;
+                    subrubroSelect.innerHTML = '<option value="">Seleccionar...</option>';
+                    
+                    data.forEach(subrubro => {
+                        const option = document.createElement('option');
+                        option.value = subrubro.id;
+                        option.textContent = subrubro.descripcion;
+                        if (subrubro.subcuenta) {
+                            option.textContent += ` (${subrubro.subcuenta})`;
+                        }
+                        subrubroSelect.appendChild(option);
+                    });
+                    
+                    // Si hay un valor antiguo, seleccionarlo
+                    const oldSubrubro = '{{ old('subrubro_id') }}';
+                    if (oldSubrubro) {
+                        subrubroSelect.value = oldSubrubro;
+                    }
+                    
+                    subrubroSelect.setAttribute('required', 'required');
+                    
+                    // Verificar si el subrubro seleccionado es el ID 3
+                    if (subrubroSelect.value == "3") {
+                        clasificacionGroup.style.display = 'block';
+                        clasificacionSelect.setAttribute('required', 'required');
+                    } else {
+                        // Si no es ID 3, ocultar clasificación
+                        clasificacionGroup.style.display = 'none';
+                        clasificacionSelect.removeAttribute('required');
+                        clasificacionSelect.value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar subrubros:', error);
+                    subrubroSelect.innerHTML = '<option value="">Error al cargar</option>';
+                });
+        }
+
+        // Función para mostrar/ocultar clasificación según el subrubro seleccionado
+        function toggleClasificacionPorSubrubro() {
+            if (subrubroSelect.value == "3") {
+                clasificacionGroup.style.display = 'block';
+                clasificacionSelect.setAttribute('required', 'required');
+            } else {
+                clasificacionGroup.style.display = 'none';
+                clasificacionSelect.removeAttribute('required');
+                clasificacionSelect.value = '';
+            }
+        }
+
+        // Función para manejar el cambio de donante
         function toggleDonanteField() {
             if (esDonacionSi.checked) {
                 donanteField.style.display = 'block';
@@ -664,11 +767,42 @@
             }
         }
         
+        // Event Listeners
         esDonacionSi.addEventListener('change', toggleDonanteField);
         esDonacionNo.addEventListener('change', toggleDonanteField);
         
-        // Inicializar estado
+        // Evento cuando cambia el rubro
+        rubroSelect.addEventListener('change', function() {
+            cargarSubrubros(this.value);
+            // Ocultar clasificación cuando cambia el rubro
+            clasificacionGroup.style.display = 'none';
+            clasificacionSelect.removeAttribute('required');
+            clasificacionSelect.value = '';
+        });
+
+        // Evento cuando cambia el subrubro
+        subrubroSelect.addEventListener('change', toggleClasificacionPorSubrubro);
+        
+        // Inicializar estado de donante
         toggleDonanteField();
+
+        // Si hay un rubro seleccionado al cargar la página (por old()), cargar sus subrubros
+        const rubroInicial = '{{ old('rubro_id') }}';
+        if (rubroInicial) {
+            // Establecer el valor del select
+            rubroSelect.value = rubroInicial;
+            // Cargar subrubros
+            cargarSubrubros(rubroInicial);
+        }
+
+        // Si hay un subrubro seleccionado al cargar la página, verificar clasificación
+        const subrubroInicial = '{{ old('subrubro_id') }}';
+        if (subrubroInicial == "3") {
+            setTimeout(() => {
+                clasificacionGroup.style.display = 'block';
+                clasificacionSelect.setAttribute('required', 'required');
+            }, 500); // Pequeño retraso para asegurar que los subrubros se cargaron
+        }
         
         // Formato de moneda para costo
         const costoInput = document.getElementById('costo');
@@ -734,14 +868,36 @@
             });
         }
         
-        // Auto-focus en el primer campo editable
-        const firstInput = document.querySelector('input:not([readonly]), select:not([readonly]), textarea:not([readonly])');
-        if (firstInput) {
-            setTimeout(() => {
-                firstInput.focus();
-            }, 100);
+
+        // ===== UBR y EAD mutuamente excluyentes =====
+        const ubrSelect = document.getElementById('ubr_id');
+        const eadSelect = document.getElementById('eade_id');
+
+        function toggleUbrEad() {
+            if (ubrSelect.value) {
+                eadSelect.disabled = true;
+            } else {
+                eadSelect.disabled = false;
+            }
+
+            if (eadSelect.value) {
+                ubrSelect.disabled = true;
+            } else {
+                ubrSelect.disabled = false;
+            }
         }
-    });
+
+        ubrSelect.addEventListener('change', toggleUbrEad);
+        eadSelect.addEventListener('change', toggleUbrEad);
+
+        toggleUbrEad();
+                const firstInput = document.querySelector('input:not([readonly]), select:not([readonly]), textarea:not([readonly])');
+                if (firstInput) {
+                    setTimeout(() => {
+                        firstInput.focus();
+                    }, 100);
+                }
+            });
 </script>
 @endsection
 @endsection

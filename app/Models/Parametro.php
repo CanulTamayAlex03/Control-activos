@@ -15,10 +15,12 @@ class Parametro extends Model
     protected $fillable = [
         'descripcion',
         'nombre_completo',
+        'valor_uma',
         'formato'
     ];
 
     protected $casts = [
+        'valor_uma'   => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

@@ -6,15 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CatalogoUbr extends Model
+class CatalogoMunicipio extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'catalogo_ubr';
+    protected $table = 'catalogo_municipios';
 
     protected $fillable = [
         'descripcion',
-        'mun_id',
         'status',
     ];
 
@@ -22,13 +21,8 @@ class CatalogoUbr extends Model
         'status' => 'boolean',
     ];
 
-    public function activos()
+    public function ubrs()
     {
-        return $this->hasMany(Activo::class, 'ubr_id');
-    }
-
-    public function municipio()
-    {
-        return $this->belongsTo(CatalogoMunicipio::class, 'mun_id', 'id');
+        return $this->hasMany(CatalogoUbr::class, 'mun_id', 'id');
     }
 }

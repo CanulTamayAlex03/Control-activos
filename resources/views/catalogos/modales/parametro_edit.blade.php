@@ -30,6 +30,16 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="edit_valor_uma" class="form-label">Valor UMA</label>
+                        <input type="number" 
+                               step="0.01" 
+                               class="form-control" 
+                               id="edit_valor_uma" 
+                               name="valor_uma">
+                        <div class="invalid-feedback" id="editValorUmaError"></div>
+                    </div>
+
+                    <div class="mb-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch"
                                 id="edit_active" name="active" value="1">

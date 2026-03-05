@@ -39,14 +39,15 @@
             <div class="table-responsive">
                 <table class="table table-sm table-striped table-hover mb-2 mx-auto" style="width: 95%; margin-top: 15px">
                     <thead class="table-dark">
-                        <tr>
-                            <th width="5%">ID</th>
-                            <th width="25%">Nombre Completo</th>
-                            <th width="40%">Descripción</th>
-                            <th width="15%">Formato</th>
-                            <th width="10%">Estado</th>
-                            <th width="10%" class="text-start">Acciones</th>
-                        </tr>
+                    <tr>
+                        <th width="5%">ID</th>
+                        <th width="25%">Nombre Completo</th>
+                        <th width="30%">Descripción</th>
+                        <th width="10%">Formato</th>
+                        <th width="10%">Valor UMA</th>
+                        <th width="10%">Estado</th>
+                        <th width="10%" class="text-start">Acciones</th>
+                    </tr>
                     </thead>
                     <tbody>
                         @foreach($parametros as $parametro)
@@ -55,6 +56,7 @@
                             <td>{{ $parametro->nombre_completo }}</td>
                             <td>{{ Str::limit($parametro->descripcion, 50) }}</td>
                             <td>{{ $parametro->formato ?? 'N/A' }}</td>
+                            <td>{{ $parametro->valor_uma ?? 'N/A' }}</td>
                             <td>
                                 @if($parametro->trashed())
                                 <span class="badge bg-danger">Inactivo</span>
@@ -70,6 +72,7 @@
                                         data-nombre_completo="{{ $parametro->nombre_completo }}"
                                         data-descripcion="{{ $parametro->descripcion }}"
                                         data-formato="{{ $parametro->formato }}"
+                                        data-valor_uma="{{ $parametro->valor_uma }}"
                                         data-active="{{ $parametro->trashed() ? 0 : 1 }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>

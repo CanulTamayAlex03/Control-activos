@@ -102,6 +102,13 @@
                     <a href="{{ route('catalogos.empleados') }}" class="ps-4 d-block">
                         <i class="fas fa-user-tie me-2"></i> Empleados
                     </a>
+                    <a href="{{ route('catalogos.eade') }}" class="ps-4 d-block">
+                        <i class="fas fa-utensils me-2"></i> Espacios de A. y D.
+                    </a>
+                    <a href="{{ route('catalogos.ubr') }}" class="ps-4 d-block">
+                        <i class="fas fa-heartbeat me-2"></i> UBR
+                    </a>
+
                 </div>
 
 

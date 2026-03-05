@@ -11,6 +11,8 @@ use App\Http\Controllers\EdificioController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\DireccionesController;
 use App\Http\Controllers\DepartamentoController;
+use App\Http\Controllers\EadeController;
+use App\Http\Controllers\UbrController;
 
 
 Route::get('/', function () {
@@ -61,6 +63,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/edit', [ActivoController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ActivoController::class, 'update'])->name('update');
         Route::get('/create/{tipo}', [ActivoController::class, 'create'])->name('create.tipo');
+
+        Route::get('/subrubros-por-rubro/{rubroId}', [ActivoController::class, 'getSubrubrosPorRubro'])
+            ->name('subrubros.por.rubro');
     });
 
     Route::prefix('herramienta-menor')
@@ -105,6 +110,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/empleados', [EmpleadoController::class, 'index'])->name('empleados');
         Route::post('/empleados', [EmpleadoController::class, 'store'])->name('empleados.store');
         Route::put('/empleados/{id}', [EmpleadoController::class, 'update'])->name('empleados.update');
+
+        Route::get('/eade', [EadeController::class, 'index'])->name('eade');
+        Route::post('/eade', [EadeController::class, 'store'])->name('eade.store');
+        Route::put('/eade/{id}', [EadeController::class, 'update'])->name('eade.update');
+
+        Route::get('/ubr', [UbrController::class, 'index'])->name('ubr');
+        Route::post('/ubr', [UbrController::class, 'store'])->name('ubr.store');
+        Route::put('/ubr/{id}', [UbrController::class, 'update'])->name('ubr.update');
     });
 
 

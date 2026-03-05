@@ -14,14 +14,12 @@
             </a>
         </div>
     </div>
-
     <div class="card border shadow-sm">
         <div class="card-header py-1 px-2 bg-light">
             <h6 class="mb-0">
                 <i class="fas fa-cube me-1"></i>Formulario de Edición
             </h6>
         </div>
-
         <form action="{{ route('activos.update', $activo->folio) }}" method="POST">
             @csrf
             @method('PUT')
@@ -40,7 +38,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @endif
-
                 @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle me-2"></i>
@@ -48,7 +45,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @endif
-
 
                 <!-- Información General -->
                 <div class="section-card mb-1">
@@ -101,45 +97,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="col-md-4">
-                                <div class="info-row">
-                                    <label class="info-label" for="clasificacion_id">Clasificación:</label>
-                                    <div class="info-value">
-                                        <select name="clasificacion_id" 
-                                                id="clasificacion_id"
-                                                class="form-select form-select-sm"
-                                                required>
-                                            <option value="">Seleccionar...</option>
-                                            @foreach($clasificaciones as $clasificacion)
-                                                <option value="{{ $clasificacion->id }}" 
-                                                    {{ old('clasificacion_id', $activo->clasificacion_id) == $clasificacion->id ? 'selected' : '' }}>
-                                                    {{ $clasificacion->descripcion }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="info-row">
-                                    <label class="info-label" for="estado_bien_id">Estado del Bien:</label>
-                                    <div class="info-value">
-                                        <select name="estado_bien_id" 
-                                                id="estado_bien_id"
-                                                class="form-select form-select-sm"
-                                                required>
-                                            <option value="">Seleccionar...</option>
-                                            @foreach($estadosBien as $estado)
-                                                <option value="{{ $estado->id }}"
-                                                    {{ old('estado_bien_id', $activo->estado_bien_id) == $estado->id ? 'selected' : '' }}>
-                                                    {{ $estado->descripcion }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="col-md-4">
                                 <div class="info-row">
                                     <label class="info-label" for="rubro_id">Rubro:</label>
@@ -159,7 +117,59 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
+                            <div class="col-md-4" id="subrubro-group" style="display:block;">
+                                <div class="info-row">
+                                    <label class="info-label" for="subrubro_id">Subrubro:</label>
+                                    <div class="info-value">
+                                        <select name="subrubro_id" 
+                                                id="subrubro_id"
+                                                class="form-select form-select-sm">
+                                            <option value="">Seleccionar...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" id="clasificacion-group" style="display:none;">
+                                <div class="info-row">
+                                    <label class="info-label" for="clasificacion_id">Clasificación:</label>
+                                    <div class="info-value">
+                                        <select name="clasificacion_id" 
+                                                id="clasificacion_id"
+                                                class="form-select form-select-sm">
+                                            <option value="">Seleccionar...</option>
+                                            @foreach($clasificaciones as $clasificacion)
+                                                <option value="{{ $clasificacion->id }}" 
+                                                    {{ old('clasificacion_id', $activo->clasificacion_id) == $clasificacion->id ? 'selected' : '' }}>
+                                                    {{ $clasificacion->descripcion }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <label class="info-label" for="estado_bien_id">Estado del Bien:</label>
+                                    <div class="info-value">
+                                        <select name="estado_bien_id" 
+                                                id="estado_bien_id"
+                                                class="form-select form-select-sm"
+                                                required>
+                                            <option value="">Seleccionar...</option>
+                                            @foreach($estadosBien as $estado)
+                                                <option value="{{ $estado->id }}"
+                                                    {{ old('estado_bien_id', $activo->estado_bien_id) == $estado->id ? 'selected' : '' }}>
+                                                    {{ $estado->descripcion }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="col-md-6">
                                 <div class="info-row">
                                     <label class="info-label">Donación/Transferencia:</label>
@@ -266,14 +276,13 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="info-row">
-                                    <label class="info-label">Fecha Captura:</label>
+                                    <label class="info-label">Fecha Registro:</label>
                                     <div class="info-value">
-                                        <input type="text" 
+                                        <input type="date" 
+                                               name="fecha_registro"
                                                class="form-control form-control-sm"
-                                               value="{{ $activo->created_at->format('d/m/Y') }}"
-                                               readonly
-                                               style="background-color: #e9ecef;">
-                                        <small class="text-muted">Fecha de creación</small>
+                                               value="{{ old('fecha_registro', optional($activo->fecha_registro)->format('Y-m-d')) }}">
+                                        <small class="text-muted">Fecha de registro del activo</small>
                                     </div>
                                 </div>
                             </div>
@@ -362,6 +371,19 @@
                                                id="entrada_almacen"
                                                class="form-control form-control-sm"
                                                value="{{ old('entrada_almacen', $activo->entrada_almacen ? $activo->entrada_almacen->format('Y-m-d') : '') }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-row">
+                                    <label class="info-label" for="folio_entrada">Folio Entrada:</label>
+                                    <div class="info-value">
+                                        <input type="text" 
+                                               name="folio_entrada" 
+                                               id="folio_entrada"
+                                               class="form-control form-control-sm"
+                                               value="{{ old('folio_entrada', $activo->folio_entrada) }}"
+                                               placeholder="Ej: FE-2024-001">
                                     </div>
                                 </div>
                             </div>
@@ -511,7 +533,7 @@
                             
                             <div class="col-md-4">
                                 <div class="info-row">
-                                    <label class="info-label" for="eade_id">EADE:</label>
+                                    <label class="info-label" for="eade_id">EAD:</label>
                                     <div class="info-value">
                                         <select name="eade_id" 
                                                 id="eade_id"
@@ -547,7 +569,6 @@
         </form>
     </div>
 </div>
-
 
 <style>
     .container-fluid {
@@ -650,12 +671,79 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Mostrar/ocultar campo donante
         const esDonacionSi = document.getElementById('es_donacion_si');
         const esDonacionNo = document.getElementById('es_donacion_no');
         const donanteField = document.getElementById('donante-field');
         const donanteInput = document.getElementById('donante');
+
+        const rubroSelect = document.getElementById('rubro_id');
+        const subrubroGroup = document.getElementById('subrubro-group');
+        const subrubroSelect = document.getElementById('subrubro_id');
+        const clasificacionGroup = document.getElementById('clasificacion-group');
+        const clasificacionSelect = document.getElementById('clasificacion_id');
         
+        let subrubros = [];
+
+        function cargarSubrubros(rubroId, subrubroSeleccionado = null) {
+            if (!rubroId) {
+                subrubroGroup.style.display = 'none';
+                subrubroSelect.innerHTML = '<option value="">Seleccionar...</option>';
+                subrubroSelect.removeAttribute('required');
+                return;
+            }
+
+            subrubroGroup.style.display = 'block';
+            
+            subrubroSelect.innerHTML = '<option value="">Cargando...</option>';
+            
+            fetch(`/activos/subrubros-por-rubro/${rubroId}`)
+                .then(response => response.json())
+                .then(data => {
+                    subrubros = data;
+                    subrubroSelect.innerHTML = '<option value="">Seleccionar...</option>';
+                    
+                    data.forEach(subrubro => {
+                        const option = document.createElement('option');
+                        option.value = subrubro.id;
+                        option.textContent = subrubro.descripcion;
+                        if (subrubro.subcuenta) {
+                            option.textContent += ` (${subrubro.subcuenta})`;
+                        }
+                        subrubroSelect.appendChild(option);
+                    });
+                    
+                    if (subrubroSeleccionado) {
+                        subrubroSelect.value = subrubroSeleccionado;
+                    }
+                    
+                    subrubroSelect.setAttribute('required', 'required');
+                    
+                    if (subrubroSelect.value == "3") {
+                        clasificacionGroup.style.display = 'block';
+                        clasificacionSelect.setAttribute('required', 'required');
+                    } else {
+                        clasificacionGroup.style.display = 'none';
+                        clasificacionSelect.removeAttribute('required');
+                        clasificacionSelect.value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar subrubros:', error);
+                    subrubroSelect.innerHTML = '<option value="">Error al cargar</option>';
+                });
+        }
+
+        function toggleClasificacionPorSubrubro() {
+            if (subrubroSelect.value == "3") {
+                clasificacionGroup.style.display = 'block';
+                clasificacionSelect.setAttribute('required', 'required');
+            } else {
+                clasificacionGroup.style.display = 'none';
+                clasificacionSelect.removeAttribute('required');
+                clasificacionSelect.value = '';
+            }
+        }
+
         function toggleDonanteField() {
             if (esDonacionSi.checked) {
                 donanteField.style.display = 'block';
@@ -670,10 +758,32 @@
         esDonacionSi.addEventListener('change', toggleDonanteField);
         esDonacionNo.addEventListener('change', toggleDonanteField);
         
-        // Inicializar estado
-        toggleDonanteField();
+        rubroSelect.addEventListener('change', function() {
+            cargarSubrubros(this.value);
+            clasificacionGroup.style.display = 'none';
+            clasificacionSelect.removeAttribute('required');
+            clasificacionSelect.value = '';
+        });
+
+        subrubroSelect.addEventListener('change', toggleClasificacionPorSubrubro);
         
-        // Formato de moneda para costo
+        toggleDonanteField();
+
+        const rubroInicial = '{{ old('rubro_id', $activo->rubro_id) }}';
+        const subrubroInicial = '{{ old('subrubro_id', $activo->subrubro_id) }}';
+        
+        if (rubroInicial) {
+            rubroSelect.value = rubroInicial;
+            cargarSubrubros(rubroInicial, subrubroInicial);
+        }
+
+        if (subrubroInicial == "3") {
+            setTimeout(() => {
+                clasificacionGroup.style.display = 'block';
+                clasificacionSelect.setAttribute('required', 'required');
+            }, 500);
+        }
+        
         const costoInput = document.getElementById('costo');
         if (costoInput) {
             costoInput.addEventListener('blur', function() {
@@ -683,7 +793,6 @@
             });
         }
         
-        // Validación de fechas
         const fechaAsignacion = document.getElementById('fecha_asignacion');
         const fechaAdquisicion = document.getElementById('fecha_adquisicion');
         
@@ -707,13 +816,11 @@
             });
         }
         
-        // Colapsar/expandir secciones
         const sectionHeaders = document.querySelectorAll('.section-header');
         sectionHeaders.forEach(header => {
             header.style.cursor = 'pointer';
             const body = header.nextElementSibling;
             
-            // Inicialmente todas las secciones expandidas
             body.style.display = 'block';
             
             header.addEventListener('click', function() {
@@ -727,7 +834,34 @@
             });
         });
         
-        // Auto-focus en el primer campo editable
+        // ===== UBR y EAD mutuamente excluyentes =====
+        const eadSelect = document.getElementById('eade_id');
+        const ubrSelect = document.getElementById('ubr_id');
+        function toggleUbrEad() {
+        if (!ubrSelect || !eadSelect) return;
+
+            if (ubrSelect.value) {
+            eadSelect.disabled = true;
+
+            } else {
+                eadSelect.disabled = false;
+            }
+            if (eadSelect.value) {
+            ubrSelect.disabled = true;
+
+            } else {
+                ubrSelect.disabled = false;
+            }
+        }
+
+        // Eventos
+        if (ubrSelect && eadSelect) {
+            ubrSelect.addEventListener('change', toggleUbrEad);
+            eadSelect.addEventListener('change', toggleUbrEad);
+        }
+
+        toggleUbrEad();
+
         const firstInput = document.querySelector('input:not([readonly]):not([type="radio"]), select:not([readonly]), textarea:not([readonly])');
         if (firstInput) {
             setTimeout(() => {

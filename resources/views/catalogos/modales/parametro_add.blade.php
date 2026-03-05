@@ -25,6 +25,16 @@
                         <input type="text" class="form-control" id="formato" name="formato" placeholder="FRM23_1">
                         <div class="invalid-feedback" id="formatoError"></div>
                     </div>
+                    <div class="mb-3">
+                        <label for="valor_uma" class="form-label">Valor UMA</label>
+                        <input type="number" 
+                               step="0.01" 
+                               class="form-control" 
+                               id="valor_uma" 
+                               name="valor_uma"
+                               placeholder="Ejemplo: 108.57">
+                        <div class="invalid-feedback" id="valor_umaError"></div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

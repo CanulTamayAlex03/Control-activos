@@ -6,6 +6,7 @@ use App\Models\Activo;
 use App\Models\CatalogoClasificacion;
 use App\Models\CatalogoEstadoBien;
 use App\Models\CatalogoRubro;
+use App\Models\CatalogoSubrubro;
 use App\Models\CatalogoProveedor;
 use App\Models\CatalogoEmpleado;
 use App\Models\CatalogoEdificio;
@@ -26,6 +27,8 @@ class ActivoController extends Controller
             $totalActivos = Activo::count();
 
             $parametrosFirmas = Parametro::all();
+
+            $valorUma = Parametro::where('id', 4)->value('valor_uma');
 
             $activo = null;
             $searchTerm = $request->get('search');
@@ -132,7 +135,8 @@ class ActivoController extends Controller
                 'estadisticas',
                 'primerActivo',
                 'ultimoActivo',
-                'parametrosFirmas'
+                'parametrosFirmas',
+                'valorUma'
             ))->with('searchTerm', $searchTerm);
         } catch (\Exception $e) {
             return redirect()->route('dashboard')
@@ -183,28 +187,24 @@ class ActivoController extends Controller
     public function create($tipo = null)
     {
         try {
-
             if (!$tipo || !in_array($tipo, ['BM', 'BV', 'BVA'])) {
                 return redirect()->route('activos.index')
                     ->with('error', 'Debe seleccionar un tipo de activo.');
             }
-
             $ultimo = Activo::where('numero_inventario', 'like', $tipo . '%')
                 ->orderBy('numero_inventario', 'desc')
                 ->first();
-
             if ($ultimo) {
                 $numero = (int) substr($ultimo->numero_inventario, strlen($tipo));
                 $siguiente = $numero + 1;
             } else {
                 $siguiente = 1;
             }
-
             $siguienteNumeroInventario = $tipo . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
-
             $clasificaciones = CatalogoClasificacion::orderBy('descripcion')->get();
             $estadosBien = CatalogoEstadoBien::orderBy('descripcion')->get();
             $rubros = CatalogoRubro::orderBy('descripcion')->get();
+            $subrubros = CatalogoSubrubro::with('rubro')->orderBy('descripcion')->get();
             $proveedores = CatalogoProveedor::orderBy('nomcorto')->get();
             $empleados = CatalogoEmpleado::orderBy('nombre')->get();
             $edificios = CatalogoEdificio::orderBy('descripcion')->get();
@@ -217,6 +217,7 @@ class ActivoController extends Controller
                 'clasificaciones',
                 'estadosBien',
                 'rubros',
+                'subrubros',
                 'proveedores',
                 'empleados',
                 'edificios',
@@ -238,23 +239,25 @@ class ActivoController extends Controller
         DB::beginTransaction();
 
         try {
-
             $request->validate([
                 'tipo_activo' => 'required|in:BM,BV,BVA',
                 'descripcion_corta' => 'required|string|max:255',
                 'descripcion_larga' => 'nullable|string',
-                'clasificacion_id' => 'required|exists:catalogo_clasificacion,id',
+                'clasificacion_id' => 'nullable|exists:catalogo_clasificacion,id',
                 'estado_bien_id'   => 'required|exists:catalogo_estado_bien,id',
                 'rubro_id'         => 'required|exists:catalogo_rubro,id',
+                'subrubro_id'      => 'nullable|exists:catalogo_subrubro,id',
                 'marca' => 'nullable|string|max:100',
                 'modelo' => 'nullable|string|max:100',
                 'numero_serie' => 'nullable|string|max:100',
                 'fecha_adquisicion' => 'nullable|date',
+                'fecha_registro' => 'nullable|date',
                 'proveedor_id'     => 'nullable|exists:catalogo_proveedor,id',
                 'costo' => 'nullable|numeric|min:0',
                 'numero_factura' => 'nullable|string|max:50',
                 'numero_pedido' => 'nullable|string|max:50',
                 'entrada_almacen' => 'nullable|date',
+                'folio_entrada' => 'nullable|string|max:255',
                 'salida_almacen' => 'nullable|date',
                 'observaciones' => 'nullable|string',
                 'es_donacion' => 'boolean',
@@ -295,7 +298,6 @@ class ActivoController extends Controller
             return redirect()->route('activos.index', ['id' => $activo->folio])
                 ->with('success', 'Activo creado con número: ' . $numeroInventario);
         } catch (\Exception $e) {
-
             DB::rollBack();
 
             return redirect()->back()
@@ -331,6 +333,20 @@ class ActivoController extends Controller
         }
     }
 
+    public function getSubrubrosPorRubro($rubroId)
+    {
+        try {
+            $subrubros = CatalogoSubrubro::where('id_rubro', $rubroId)
+                ->where('status', 1)
+                ->orderBy('descripcion')
+                ->get(['id', 'descripcion']);
+
+            return response()->json($subrubros);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al cargar subrubros'], 500);
+        }
+    }
+
     public function edit($id)
     {
         try {
@@ -338,6 +354,7 @@ class ActivoController extends Controller
                 'clasificacion',
                 'estadoBien',
                 'rubro',
+                'subrubro',
                 'proveedor',
                 'empleado',
                 'edificio',
@@ -350,6 +367,12 @@ class ActivoController extends Controller
             $clasificaciones = CatalogoClasificacion::orderBy('descripcion')->get();
             $estadosBien = CatalogoEstadoBien::orderBy('descripcion')->get();
             $rubros = CatalogoRubro::orderBy('descripcion')->get();
+
+            $subrubros = CatalogoSubrubro::where('id_rubro', $activo->rubro_id)
+                ->where('status', 1)
+                ->orderBy('descripcion')
+                ->get();
+
             $proveedores = CatalogoProveedor::orderBy('nomcorto')->get();
             $empleados = CatalogoEmpleado::orderBy('nombre')->get();
             $edificios = CatalogoEdificio::orderBy('descripcion')->get();
@@ -363,6 +386,7 @@ class ActivoController extends Controller
                 'clasificaciones',
                 'estadosBien',
                 'rubros',
+                'subrubros',
                 'proveedores',
                 'empleados',
                 'edificios',
@@ -373,7 +397,7 @@ class ActivoController extends Controller
             ));
         } catch (\Exception $e) {
             return redirect()->route('activos.index')
-                ->with('error', 'Activo no encontrado o error al cargar el formulario: ' . $e->getMessage());
+                ->with('error', 'Error al cargar el formulario: ' . $e->getMessage());
         }
     }
 
@@ -386,18 +410,21 @@ class ActivoController extends Controller
                 'numero_inventario' => 'required|unique:activos,numero_inventario,' . $id . ',folio',
                 'descripcion_corta' => 'required|string|max:255',
                 'descripcion_larga' => 'nullable|string',
-                'clasificacion_id' => 'required|exists:catalogo_clasificacion,id',
+                'clasificacion_id' => 'required_if:rubro_id,5|nullable|exists:catalogo_clasificacion,id',
                 'estado_bien_id'   => 'required|exists:catalogo_estado_bien,id',
                 'rubro_id'         => 'required|exists:catalogo_rubro,id',
+                'subrubro_id'      => 'nullable|exists:catalogo_subrubro,id',
                 'marca' => 'nullable|string|max:100',
                 'modelo' => 'nullable|string|max:100',
                 'numero_serie' => 'nullable|string|max:100',
                 'fecha_adquisicion' => 'nullable|date',
+                'fecha_registro' => 'nullable|date',
                 'proveedor_id'     => 'nullable|exists:catalogo_proveedor,id',
                 'costo' => 'nullable|numeric|min:0',
                 'numero_factura' => 'nullable|string|max:50',
                 'numero_pedido' => 'nullable|string|max:50',
                 'entrada_almacen' => 'nullable|date',
+                'folio_entrada' => 'nullable|string|max:255',
                 'salida_almacen' => 'nullable|date',
                 'observaciones' => 'nullable|string',
                 'es_donacion' => 'boolean',
@@ -414,8 +441,8 @@ class ActivoController extends Controller
 
             $activo->update($validated);
 
-            return redirect()->route('activos.show', $activo->folio)
-                ->with('success', 'Activo actualizado exitosamente.');
+            return redirect()->route('activos.index', ['id' => $activo->folio])
+            ->with('success', 'Activo actualizado exitosamente.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->errors())

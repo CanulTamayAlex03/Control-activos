@@ -20,7 +20,7 @@
             </a>
             @endif
         </form>
-        @if(request('search') && !$activo)
+        @if(request('search') && (!$activo || !$activo->folio))
         <small class="text-danger mt-1 d-block">
             <i class="fas fa-exclamation-triangle me-1"></i>
             No se encontró un activo con folio o número de inventario "{{ request('search') }}"
@@ -29,9 +29,11 @@
     </div>
     <div class="col-md-4 text-end px-0 d-flex justify-content-end align-items-center">
         @can ('editar activos')
-        <a href="{{ route('activos.edit', $activo->folio) }}" class="btn btn-warning btn-sm ms-2 me-2">
-            <i class="fas fa-edit me-1"></i> Editar
-        </a>
+            @if($activo)
+            <a href="{{ route('activos.edit', $activo->folio) }}" class="btn btn-warning btn-sm ms-2 me-2">
+                <i class="fas fa-edit me-1"></i> Editar
+            </a>
+            @endif
         @endcan
         @can ('crear activos')
         <button type="button" 
@@ -44,7 +46,7 @@
 
         <span class="badge bg-light text-dark border small">
             <i class="fas fa-box me-1"></i>
-            {{ $activo->folio ?? '0' }}/{{ $totalActivos ?? '0' }}
+            {{ $activo ? $activo->folio : '0' }}/{{ $totalActivos ?? '0' }}
         </span>
     </div>
 </div>
@@ -108,6 +110,14 @@
                             </div>
                             @endif
                             <div class="info-row">
+                                <span class="info-label">Rubro:</span>
+                                <span class="info-value">{{ $activo->rubro->descripcion ?? '-' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">SubRubro:</span>
+                                <span class="info-value">{{ $activo->subrubro->descripcion ?? '-' }}</span>
+                            </div>
+                            <div class="info-row">
                                 <span class="info-label">Clasificación:</span>
                                 <span class="info-value">{{ $activo->clasificacion->descripcion ?? '-' }}</span>
                             </div>
@@ -118,10 +128,6 @@
                                         {{ $activo->estadoBien->descripcion ?? 'N/A' }}
                                     </span>
                                 </span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Rubro:</span>
-                                <span class="info-value">{{ $activo->rubro->descripcion ?? '-' }}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Donación/Transferencia:</span>
@@ -137,12 +143,12 @@
                                     @endif
                                 </span>
                             </div>
-                            @if($activo->es_donacion && $activo->donante)
+                            
                             <div class="info-row">
                                 <span class="info-label">Donante:</span>
-                                <span class="info-value">{{ $activo->donante }}</span>
+                                <span class="info-value">{{ $activo->donante ?: '-' }}</span>
                             </div>
-                            @endif
+                            
                         </div>
                     </div>
                     
@@ -174,9 +180,9 @@
                                 </span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Fecha Captura:</span>
+                                <span class="info-label">Fecha Registro:</span>
                                 <span class="info-value">
-                                    {{ $activo->created_at->format('d/m/Y') }}
+                                    {{ $activo->fecha_registro? $activo->fecha_registro->format('d/m/Y') : '-' }}
                                 </span>
                             </div>
                         </div>
@@ -196,9 +202,19 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Costo:</span>
-                                <span class="info-value text-success fw-bold">
+                                @php
+                                    $esMayorIgualUMA = $valorUma && $activo->costo >= $valorUma;
+                                @endphp
+                                
+                                <span class="info-value fw-bold {{ $esMayorIgualUMA ? 'text-success' : 'text-danger' }}">
                                     ${{ number_format($activo->costo, 2) }}
                                 </span>
+                                
+                                @if($valorUma)
+                                    <div class="small text-muted">
+                                        Valor UMA: ${{ number_format($valorUma, 2) }}
+                                    </div>
+                                @endif
                             </div>
                             <div class="info-row">
                                 <span class="info-label"># Factura:</span>
@@ -212,6 +228,12 @@
                                 <span class="info-label">Entrada Almacén:</span>
                                 <span class="info-value">
                                     {{ $activo->entrada_almacen ? $activo->entrada_almacen->format('d/m/Y') : '-' }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Folio Entrada:</span>
+                                <span class="info-value">
+                                    {{ $activo->folio_entrada ?: '-' }}
                                 </span>
                             </div>
                             <div class="info-row">
@@ -274,7 +296,7 @@
                                 <span class="info-value">{{ $activo->ubr->descripcion ?? '-' }}</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">EADE:</span>
+                                <span class="info-label">EAD:</span>
                                 <span class="info-value">{{ $activo->eade->descripcion ?? '-' }}</span>
                             </div>
                         </div>
@@ -348,16 +370,35 @@
     </div>
 
     @else
-    <div class="text-center py-5">
-        <i class="fas fa-box-open fa-2x text-muted mb-3"></i>
-        <p class="text-muted">No hay activos registrados</p>
+    <!-- Mensaje cuando no hay activos -->
+    <div class="text-center py-5 mt-5">
+        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No hay activos registrados</h5>
+        @can ('crear activos')
+        <p class="text-muted mb-3">Comienza creando un nuevo activo</p>
+        <button type="button" 
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#tipoActivoModal">
+            <i class="fas fa-plus me-1"></i> Crear Primer Activo
+        </button>
+        @endcan
     </div>
     @endif
 </div>
+
+@if($activo)
+<!-- Modals cuando hay activo -->
 @push('modals')
     @include('activos.modales.resguardo-modal')
     @include('activos.modales.tipo_activo-modal')
 @endpush
+@else
+<!-- Modal de tipo activo siempre disponible -->
+@push('modals')
+    @include('activos.modales.tipo_activo-modal')
+@endpush
+@endif
 
 <style>
     .container-fluid {
@@ -472,6 +513,8 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Solo agregar eventos de teclado si hay activo
+        @if($activo)
         document.addEventListener('keydown', function(e) {
             if (e.key === 'ArrowLeft' && {{ $activoAnterior ? 'true' : 'false' }}) {
                 window.location.href = "{{ $activoAnterior ? route('activos.index', ['id' => $activoAnterior->folio]) : '#' }}";
@@ -495,6 +538,7 @@
                 document.getElementById('search-input').select();
             }
         });
+        @endif
         
         const sectionHeaders = document.querySelectorAll('.section-header');
         sectionHeaders.forEach(header => {

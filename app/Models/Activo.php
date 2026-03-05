@@ -23,9 +23,11 @@ class Activo extends Model
         'modelo',
         'numero_serie',
         'fecha_adquisicion',
+        'fecha_registro',
         'clasificacion_id',
         'estado_bien_id',
         'rubro_id',
+        'subrubro_id',
         'es_donacion',
         'donante',
         'proveedor_id',
@@ -33,6 +35,7 @@ class Activo extends Model
         'numero_factura',
         'numero_pedido',
         'entrada_almacen',
+        'folio_entrada',
         'salida_almacen',
         'observaciones',
         'empleado_id',
@@ -47,6 +50,7 @@ class Activo extends Model
 
     protected $casts = [
         'fecha_adquisicion' => 'date',
+        'fecha_registro' => 'date',
         'es_donacion' => 'boolean',
         'costo' => 'decimal:2',
         'entrada_almacen' => 'date',
@@ -76,6 +80,10 @@ class Activo extends Model
         return $this->belongsTo(CatalogoRubro::class, 'rubro_id');
     }
 
+    public function subrubro()
+    {
+        return $this->belongsTo(CatalogoSubrubro::class, 'subrubro_id');
+    }
 
     public function proveedor()
     {
@@ -152,7 +160,7 @@ class Activo extends Model
         return $query->where('status', true);
     }
 
- 
+
     public function scopeInactivos($query)
     {
         return $query->where('status', false);
@@ -168,7 +176,7 @@ class Activo extends Model
     public function scopeEnAlmacen($query)
     {
         return $query->whereNotNull('entrada_almacen')
-                    ->whereNull('salida_almacen');
+            ->whereNull('salida_almacen');
     }
 
 
@@ -192,9 +200,9 @@ class Activo extends Model
 
     public function scopePorDescripcion($query, $descripcion)
     {
-        return $query->where(function($q) use ($descripcion) {
+        return $query->where(function ($q) use ($descripcion) {
             $q->where('descripcion_corta', 'LIKE', "%{$descripcion}%")
-              ->orWhere('descripcion_larga', 'LIKE', "%{$descripcion}%");
+                ->orWhere('descripcion_larga', 'LIKE', "%{$descripcion}%");
         });
     }
 }

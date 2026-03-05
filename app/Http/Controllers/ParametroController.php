@@ -31,12 +31,14 @@ class ParametroController extends Controller
         $request->validate([
             'nombre_completo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
+            'valor_uma' => 'nullable|numeric|min:0',
             'formato' => 'nullable|string|max:100'
         ]);
 
         Parametro::create([
             'nombre_completo' => $request->nombre_completo,
             'descripcion' => $request->descripcion,
+            'valor_uma' => $request->valor_uma,
             'formato' => $request->formato
         ]);
 
@@ -53,11 +55,13 @@ class ParametroController extends Controller
         $request->validate([
             'nombre_completo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
+            'valor_uma' => 'nullable|numeric|min:0',
             'formato' => 'nullable|string|max:100'
         ]);
 
         $parametro->nombre_completo = $request->nombre_completo;
         $parametro->descripcion = $request->descripcion;
+        $parametro->valor_uma = $request->valor_uma;
         $parametro->formato = $request->formato;
 
         if ($request->active == 1) {
