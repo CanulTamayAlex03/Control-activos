@@ -201,6 +201,7 @@ class ActivoController extends Controller
                 $siguiente = 1;
             }
             $siguienteNumeroInventario = $tipo . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
+            $valorUma = Parametro::where('id', 4)->value('valor_uma');
             $clasificaciones = CatalogoClasificacion::orderBy('descripcion')->get();
             $estadosBien = CatalogoEstadoBien::orderBy('descripcion')->get();
             $rubros = CatalogoRubro::orderBy('descripcion')->get();
@@ -226,7 +227,8 @@ class ActivoController extends Controller
                 'ubrs',
                 'eades',
                 'tipo',
-                'siguienteNumeroInventario'
+                'siguienteNumeroInventario',
+                'valorUma'
             ));
         } catch (\Exception $e) {
             return redirect()->route('activos.index')
@@ -364,6 +366,8 @@ class ActivoController extends Controller
                 'eade'
             ])->findOrFail($id);
 
+            $valorUma = Parametro::where('id', 4)->value('valor_uma');
+
             $clasificaciones = CatalogoClasificacion::orderBy('descripcion')->get();
             $estadosBien = CatalogoEstadoBien::orderBy('descripcion')->get();
             $rubros = CatalogoRubro::orderBy('descripcion')->get();
@@ -393,7 +397,8 @@ class ActivoController extends Controller
                 'departamentos',
                 'direcciones',
                 'ubrs',
-                'eades'
+                'eades',
+                'valorUma'
             ));
         } catch (\Exception $e) {
             return redirect()->route('activos.index')

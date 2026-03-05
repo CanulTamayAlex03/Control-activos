@@ -222,11 +222,11 @@ td {
 <table>
     <tr>
         <th class="label">Departamento</th>
-        <th class="label">Área</th> 
+        <th class="label">Edificio</th> 
     </tr>
     <tr>
         <td>{{ $activo->departamento->descripcion ?? '' }}</td>
-        <td>{{ $activo->subgerencia->descripcion ?? '' }}</td>
+        <td>{{ $activo->edificio->descripcion ?? '' }}</td>
     </tr>
 </table>
 
@@ -265,7 +265,7 @@ td {
         <th class="label">Responsable del bien</th>
     </tr>
     <tr>
-        <td>{{ $activo->edificio->descripcion ?? 'No especificado'}}</td>
+        <td>{{ $activo->departamento->descripcion ?? 'No especificado'}}</td>
         <td>{{ $activo->empleado->nombre ?? 'No especificado' }}</td>
     </tr>
 </table>

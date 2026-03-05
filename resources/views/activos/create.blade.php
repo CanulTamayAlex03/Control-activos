@@ -14,7 +14,6 @@
             </a>
         </div>
     </div>
-
     <div class="card border shadow-sm">
         <div class="card-header py-1 px-2 bg-light">
             <h6 class="mb-0">
@@ -328,6 +327,12 @@
                                                    step="0.01"
                                                    min="0"
                                                    placeholder="0.00">
+                                        </div>
+                                        <div class="mt-1" id="uma-message">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Ingrese un costo
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -669,235 +674,6 @@
 </style>
 
 @section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Mostrar/ocultar campo donante
-        const esDonacionSi = document.getElementById('es_donacion_si');
-        const esDonacionNo = document.getElementById('es_donacion_no');
-        const donanteField = document.getElementById('donante-field');
-        const donanteInput = document.getElementById('donante');
-
-        const rubroSelect = document.getElementById('rubro_id');
-        const subrubroGroup = document.getElementById('subrubro-group');
-        const subrubroSelect = document.getElementById('subrubro_id');
-        const clasificacionGroup = document.getElementById('clasificacion-group');
-        const clasificacionSelect = document.getElementById('clasificacion_id');
-        
-        // Variable para almacenar los subrubros cargados
-        let subrubros = [];
-
-        // Función para cargar subrubros según el rubro seleccionado
-        function cargarSubrubros(rubroId) {
-            if (!rubroId) {
-                subrubroGroup.style.display = 'none';
-                subrubroSelect.innerHTML = '<option value="">Seleccionar...</option>';
-                subrubroSelect.removeAttribute('required');
-                return;
-            }
-
-            // Mostrar el grupo de subrubros
-            subrubroGroup.style.display = 'block';
-            
-            // Limpiar opciones actuales
-            subrubroSelect.innerHTML = '<option value="">Cargando...</option>';
-            
-            // Hacer petición AJAX para obtener los subrubros del rubro seleccionado
-            fetch(`/activos/subrubros-por-rubro/${rubroId}`)
-                .then(response => response.json())
-                .then(data => {
-                    subrubros = data;
-                    subrubroSelect.innerHTML = '<option value="">Seleccionar...</option>';
-                    
-                    data.forEach(subrubro => {
-                        const option = document.createElement('option');
-                        option.value = subrubro.id;
-                        option.textContent = subrubro.descripcion;
-                        if (subrubro.subcuenta) {
-                            option.textContent += ` (${subrubro.subcuenta})`;
-                        }
-                        subrubroSelect.appendChild(option);
-                    });
-                    
-                    // Si hay un valor antiguo, seleccionarlo
-                    const oldSubrubro = '{{ old('subrubro_id') }}';
-                    if (oldSubrubro) {
-                        subrubroSelect.value = oldSubrubro;
-                    }
-                    
-                    subrubroSelect.setAttribute('required', 'required');
-                    
-                    // Verificar si el subrubro seleccionado es el ID 3
-                    if (subrubroSelect.value == "3") {
-                        clasificacionGroup.style.display = 'block';
-                        clasificacionSelect.setAttribute('required', 'required');
-                    } else {
-                        // Si no es ID 3, ocultar clasificación
-                        clasificacionGroup.style.display = 'none';
-                        clasificacionSelect.removeAttribute('required');
-                        clasificacionSelect.value = '';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al cargar subrubros:', error);
-                    subrubroSelect.innerHTML = '<option value="">Error al cargar</option>';
-                });
-        }
-
-        // Función para mostrar/ocultar clasificación según el subrubro seleccionado
-        function toggleClasificacionPorSubrubro() {
-            if (subrubroSelect.value == "3") {
-                clasificacionGroup.style.display = 'block';
-                clasificacionSelect.setAttribute('required', 'required');
-            } else {
-                clasificacionGroup.style.display = 'none';
-                clasificacionSelect.removeAttribute('required');
-                clasificacionSelect.value = '';
-            }
-        }
-
-        // Función para manejar el cambio de donante
-        function toggleDonanteField() {
-            if (esDonacionSi.checked) {
-                donanteField.style.display = 'block';
-                donanteInput.required = true;
-            } else {
-                donanteField.style.display = 'none';
-                donanteInput.required = false;
-                donanteInput.value = '';
-            }
-        }
-        
-        // Event Listeners
-        esDonacionSi.addEventListener('change', toggleDonanteField);
-        esDonacionNo.addEventListener('change', toggleDonanteField);
-        
-        // Evento cuando cambia el rubro
-        rubroSelect.addEventListener('change', function() {
-            cargarSubrubros(this.value);
-            // Ocultar clasificación cuando cambia el rubro
-            clasificacionGroup.style.display = 'none';
-            clasificacionSelect.removeAttribute('required');
-            clasificacionSelect.value = '';
-        });
-
-        // Evento cuando cambia el subrubro
-        subrubroSelect.addEventListener('change', toggleClasificacionPorSubrubro);
-        
-        // Inicializar estado de donante
-        toggleDonanteField();
-
-        // Si hay un rubro seleccionado al cargar la página (por old()), cargar sus subrubros
-        const rubroInicial = '{{ old('rubro_id') }}';
-        if (rubroInicial) {
-            // Establecer el valor del select
-            rubroSelect.value = rubroInicial;
-            // Cargar subrubros
-            cargarSubrubros(rubroInicial);
-        }
-
-        // Si hay un subrubro seleccionado al cargar la página, verificar clasificación
-        const subrubroInicial = '{{ old('subrubro_id') }}';
-        if (subrubroInicial == "3") {
-            setTimeout(() => {
-                clasificacionGroup.style.display = 'block';
-                clasificacionSelect.setAttribute('required', 'required');
-            }, 500); // Pequeño retraso para asegurar que los subrubros se cargaron
-        }
-        
-        // Formato de moneda para costo
-        const costoInput = document.getElementById('costo');
-        if (costoInput) {
-            costoInput.addEventListener('blur', function() {
-                if (this.value) {
-                    this.value = parseFloat(this.value).toFixed(2);
-                }
-            });
-        }
-        
-        // Validación de fechas
-        const fechaAsignacion = document.getElementById('fecha_asignacion');
-        const fechaAdquisicion = document.getElementById('fecha_adquisicion');
-        
-        if (fechaAdquisicion && fechaAsignacion) {
-            fechaAdquisicion.addEventListener('change', function() {
-                if (this.value && fechaAsignacion.value) {
-                    if (new Date(fechaAsignacion.value) < new Date(this.value)) {
-                        alert('La fecha de asignación no puede ser anterior a la fecha de adquisición');
-                        fechaAsignacion.value = '';
-                    }
-                }
-            });
-            
-            fechaAsignacion.addEventListener('change', function() {
-                if (this.value && fechaAdquisicion.value) {
-                    if (new Date(this.value) < new Date(fechaAdquisicion.value)) {
-                        alert('La fecha de asignación no puede ser anterior a la fecha de adquisición');
-                        this.value = '';
-                    }
-                }
-            });
-        }
-        
-        // Colapsar/expandir secciones
-        const sectionHeaders = document.querySelectorAll('.section-header');
-        sectionHeaders.forEach(header => {
-            header.style.cursor = 'pointer';
-            const body = header.nextElementSibling;
-            
-            // Inicialmente todas las secciones expandidas
-            body.style.display = 'block';
-            
-            header.addEventListener('click', function() {
-                if (body.style.display === 'none') {
-                    body.style.display = 'block';
-                    this.querySelector('i').style.transform = 'rotate(0deg)';
-                } else {
-                    body.style.display = 'none';
-                    this.querySelector('i').style.transform = 'rotate(-90deg)';
-                }
-            });
-        });
-        
-        // Confirmación antes de limpiar
-        const resetButton = document.querySelector('button[type="reset"]');
-        if (resetButton) {
-            resetButton.addEventListener('click', function(e) {
-                if (!confirm('¿Estás seguro de que deseas limpiar todos los campos del formulario?')) {
-                    e.preventDefault();
-                }
-            });
-        }
-        
-
-        // ===== UBR y EAD mutuamente excluyentes =====
-        const ubrSelect = document.getElementById('ubr_id');
-        const eadSelect = document.getElementById('eade_id');
-
-        function toggleUbrEad() {
-            if (ubrSelect.value) {
-                eadSelect.disabled = true;
-            } else {
-                eadSelect.disabled = false;
-            }
-
-            if (eadSelect.value) {
-                ubrSelect.disabled = true;
-            } else {
-                ubrSelect.disabled = false;
-            }
-        }
-
-        ubrSelect.addEventListener('change', toggleUbrEad);
-        eadSelect.addEventListener('change', toggleUbrEad);
-
-        toggleUbrEad();
-                const firstInput = document.querySelector('input:not([readonly]), select:not([readonly]), textarea:not([readonly])');
-                if (firstInput) {
-                    setTimeout(() => {
-                        firstInput.focus();
-                    }, 100);
-                }
-            });
-</script>
+@include('activos.scripts.activos_create_script')
 @endsection
 @endsection

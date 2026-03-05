@@ -154,7 +154,7 @@ body {
 </div>
 
 <div class="info-superior">
-    <span>FECHA DE ALTA: {{ $activo->created_at ? $activo->created_at->format('d/m/Y') : '' }}
+    <span>FECHA DE ALTA: {{ $activo->fecha_registro ? $activo->fecha_registro->format('d/m/Y') : '' }}
 </span>
     <span style="text-align:right;" >No. DE INVENTARIO: {{ $activo->numero_inventario ?? '________' }}</span>
 </div>
@@ -166,9 +166,9 @@ body {
 <div class="numero"><strong>5.</strong> <span class="label">Proveedor:</span> {{ $activo->proveedor->nomcorto ?? '' }}</div>
 <div class="numero"><strong>6.</strong> <span class="label">No. de Factura:</span> {{ $activo->numero_factura ?? '' }} </div>
 <div class="numero"><strong>7.</strong> <span class="label">Costo del Bien:</span> ${{ number_format($activo->costo ?? 0, 2) }}</div>
-<div class="numero"><strong>8.</strong> <span class="label">Fecha de Recepción:</span> {{ $activo->created_at ? $activo->created_at->format('d/m/Y') : '' }}
+<div class="numero"><strong>8.</strong> <span class="label">Fecha de Recepción:</span> {{ $activo->entrada_almacen ? $activo->entrada_almacen->format('d/m/Y') : '' }}
 </div>
-<div class="numero"><strong>9.</strong> <span class="label">Número de folio de Entrada a Almacén:</span> {{ $activo->folio }}</div>
+<div class="numero"><strong>9.</strong> <span class="label">Número de folio de Entrada a Almacén:</span> {{ $activo->folio_entrada }}</div>
 <div class="numero"><strong>10.</strong> <span class="label">Estado físico del Bien:</span> {{ $activo->estadoBien->descripcion ?? '' }}</div>
 
 <br>
