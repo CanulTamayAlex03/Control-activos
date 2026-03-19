@@ -38,9 +38,13 @@
                     <i class="fas fa-chevron-down small" id="iconActivos"></i>
                 </a>
 
+         
                 <div id="menuActivos" style="font-size: 15px;">
                     <a href="{{ route('activos.index') }}" class="ps-4 d-block">
                         <i class="fas fa-box me-2"></i> Activo
+                    </a>
+                    <a href="{{ route('activos.bajas.index') }}" class="ps-4 d-block">
+                        <i class="fas fa-rotate me-2"></i> Movimientos
                     </a>
                     <a href="{{ route('activos.activos_tipos') }}" class="ps-4 d-block">
                         <i class="fas fa-tags me-2"></i> Tipos de Activo
@@ -108,9 +112,10 @@
                     <a href="{{ route('catalogos.ubr') }}" class="ps-4 d-block">
                         <i class="fas fa-heartbeat me-2"></i> UBR
                     </a>
-
+                    <a href="{{ route('catalogos.proveedores') }}" class="ps-4 d-block">
+                        <i class="fas fa-truck me-2"></i> Proveedores
+                    </a>
                 </div>
-
 
                 @canany(['ver usuarios', 'ver permisos'])
                 <div class="mt-3 mb-2 px-3">

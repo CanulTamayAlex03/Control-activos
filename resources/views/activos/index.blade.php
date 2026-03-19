@@ -125,7 +125,18 @@
                                 <span class="info-label">Estado del Bien:</span>
                                 <span class="info-value">
                                     <span class="badge bg-warning text-dark">
-                                        {{ $activo->estadoBien->descripcion ?? 'N/A' }}
+                                        {{ $activo->estadoBien->descripcion ?? 'N/A' }} 
+                                    </span>
+                                    <span>
+                                        {{ $activo->fecha_baja ? $activo->fecha_baja->format('d/m/Y') : '' }}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Estado anterior:</span>
+                                <span class="info-value">
+                                    <span class="badge bg-warning text-dark">
+                                        {{ $activo->estado_bien_old ?? 'N/A' }}
                                     </span>
                                 </span>
                             </div>
@@ -201,6 +212,10 @@
                                 <span class="info-value">{{ $activo->proveedor->nomcorto ?? '-' }}</span>
                             </div>
                             <div class="info-row">
+                                <span class="info-label">Proveedor anterior:</span>
+                                <span class="info-value">{{ $activo->proveedor_old }}</span>
+                            </div>
+                            <div class="info-row">
                                 <span class="info-label">Costo:</span>
                                 @php
                                     $esMayorIgualUMA = $valorUma && $activo->costo >= $valorUma;
@@ -269,9 +284,13 @@
                                             <div class="text-muted small">Nómina: {{ $activo->empleado->no_nomi }}</div>
                                         @endif
                                     @else
-                                        <span class="text-muted">No asignado</span>
+                                        <span class="text-muted">-</span>
                                     @endif
                                 </span>
+                            </div>
+                                                        <div class="info-row">
+                                <span class="info-label">Empleado anterior:</span>
+                                <span class="info-value">{{ $activo->empleado_old ?? '-' }}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Fecha Asignación:</span>
@@ -296,8 +315,16 @@
                                 <span class="info-value">{{ $activo->ubr->descripcion ?? '-' }}</span>
                             </div>
                             <div class="info-row">
+                                <span class="info-label">UBR anterior:</span>
+                                <span class="info-value">{{ $activo->ubr_old ?? '-' }}</span>
+                            </div>
+                            <div class="info-row">
                                 <span class="info-label">EAD:</span>
                                 <span class="info-value">{{ $activo->eade->descripcion ?? '-' }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">EAD anterior:</span>
+                                <span class="info-value">{{ $activo->ead_old ?? '-' }}</span>
                             </div>
                         </div>
                     </div>

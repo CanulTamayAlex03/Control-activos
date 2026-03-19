@@ -447,7 +447,7 @@ class ActivoController extends Controller
             $activo->update($validated);
 
             return redirect()->route('activos.index', ['id' => $activo->folio])
-            ->with('success', 'Activo actualizado exitosamente.');
+                ->with('success', 'Activo actualizado exitosamente.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->errors())
@@ -526,5 +526,77 @@ class ActivoController extends Controller
             'vobo'
         ))->setPaper('letter', 'portrait');
         return $pdf->stream('FRM23_' . $activo->numero_inventario . '.pdf');
+    }
+
+    public function bajasIndex(Request $request)
+    {
+        $activo = null;
+
+        if ($request->filled('search')) {
+            $activo = Activo::where('numero_inventario', $request->search)->first();
+        }
+        $elaboro = Parametro::find(1);
+        $vobo    = Parametro::find(3);
+
+        return view('activos.activo-bajas', compact('activo', 'elaboro', 'vobo'));
+    }
+
+    public function darDeBaja(Request $request)
+    {
+        $request->validate([
+            'numero_inventario' => 'required|exists:activos,numero_inventario',
+            'fecha_baja' => 'required|date',
+            'motivo_baja' => 'required|string|max:255',
+            'recibido_por' => 'required|string|max:255',
+        ]);
+
+        $activo = Activo::where('numero_inventario', $request->numero_inventario)->firstOrFail();
+
+        if ($activo->fecha_baja) {
+            return back()->with('error', 'Este activo ya está dado de baja.');
+        }
+
+        $activo->update([
+            'fecha_baja' => $request->fecha_baja,
+            'motivo_baja' => $request->motivo_baja,
+            'estado_bien_id' => 2
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'pdf_url' => route('activos.print.formato_baja', [
+                'folio' => $activo->folio,
+                'recibido_por' => strtoupper($request->recibido_por)
+            ])
+        ]);
+    }
+
+    public function printFormatoBaja(Request $request, $folio)
+    {
+        $activo = Activo::with([
+            'proveedor',
+            'empleado',
+            'departamento',
+            'edificio',
+            'estadoBien'
+        ])->findOrFail($folio);
+
+        if (!$activo->fecha_baja) {
+            return redirect()->back()->with('error', 'Este activo no está dado de baja.');
+        }
+
+        $elaboro = Parametro::find(1);
+        $vobo    = Parametro::find(3);
+
+        $recibidoPor = $request->recibido_por ?? 'Nombre';
+
+        $pdf = Pdf::loadView('activos.print.formato_baja', compact(
+            'activo',
+            'elaboro',
+            'vobo',
+            'recibidoPor'
+        ))->setPaper('letter', 'portrait');
+
+        return $pdf->stream('formato_bajaAF-' . $activo->numero_inventario . '.pdf');
     }
 }

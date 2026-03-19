@@ -26,26 +26,35 @@ class Activo extends Model
         'fecha_registro',
         'clasificacion_id',
         'estado_bien_id',
+        'estado_bien_old',
         'rubro_id',
         'subrubro_id',
         'es_donacion',
         'donante',
         'proveedor_id',
+        'proveedor_old',
         'costo',
         'numero_factura',
         'numero_pedido',
         'entrada_almacen',
         'folio_entrada',
+        'folio_salida',
         'salida_almacen',
         'observaciones',
         'empleado_id',
+        'empleado_old',
         'edificio_id',
         'departamento_id',
         'direccion_id',
         'ubr_id',
+        'ubr_old',
         'eade_id',
+        'eade_old',
         'fecha_asignacion',
+        'fecha_baja',
+        'motivo_baja',
         'status',
+        'fecha_traslado',
     ];
 
     protected $casts = [
@@ -56,6 +65,8 @@ class Activo extends Model
         'entrada_almacen' => 'date',
         'salida_almacen' => 'date',
         'fecha_asignacion' => 'date',
+        'fecha_baja' => 'date',
+        'fecha_traslado' => 'date',
         'status' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -105,7 +116,8 @@ class Activo extends Model
 
     public function departamento()
     {
-        return $this->belongsTo(CatalogoDepartamento::class, 'departamento_id');
+        return $this->belongsTo(CatalogoDepartamento::class, 'departamento_id')
+            ->withTrashed();
     }
 
 

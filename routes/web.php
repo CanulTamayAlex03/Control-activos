@@ -13,7 +13,7 @@ use App\Http\Controllers\DireccionesController;
 use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\EadeController;
 use App\Http\Controllers\UbrController;
-
+use App\Http\Controllers\ProveedorController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -39,13 +39,15 @@ Route::middleware(['auth'])->group(function () {
         Route::view('/activos_reportes', 'activos.activos_reportes')
             ->name('activos_reportes');
 
+        Route::get('/bajas', [ActivoController::class, 'bajasIndex'])->name('bajas.index');
+        Route::post('/bajas', [ActivoController::class, 'darDeBaja'])->name('bajas.store');
+
         Route::get('/search', [ActivoController::class, 'search'])->name('search');
 
         Route::post(
             '/{folio}/resguardo',
             [ActivoController::class, 'resguardo']
         )->name('resguardo');
-
 
         Route::get(
             '/{folio}/modal-resguardo',
@@ -56,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
             '/{folio}/print/frm23',
             [ActivoController::class, 'printFrm23']
         )->name('print.frm23');
+
+        Route::get('/{folio}/print/formato_baja', [ActivoController::class, 'printFormatoBaja'])->name('print.formato_baja');
 
         Route::get('/create', [ActivoController::class, 'create'])->name('create');
         Route::post('/', [ActivoController::class, 'store'])->name('store');
@@ -118,6 +122,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/ubr', [UbrController::class, 'index'])->name('ubr');
         Route::post('/ubr', [UbrController::class, 'store'])->name('ubr.store');
         Route::put('/ubr/{id}', [UbrController::class, 'update'])->name('ubr.update');
+
+        Route::get('/proveedores', [ProveedorController::class, 'index'])->name('proveedores');
+        Route::post('/proveedores', [ProveedorController::class, 'store'])->name('proveedores.store');
+        Route::put('/proveedores/{id}', [ProveedorController::class, 'update'])->name('proveedores.update');
     });
 
 
