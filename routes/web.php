@@ -42,6 +42,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bajas', [ActivoController::class, 'bajasIndex'])->name('bajas.index');
         Route::post('/bajas', [ActivoController::class, 'darDeBaja'])->name('bajas.store');
 
+        Route::get('/traspasos', [ActivoController::class, 'traspasosIndex'])->name('traspasos.index');
+        Route::post('/traspasos', [ActivoController::class, 'darTraspaso'])->name('traspasos.store');
+
         Route::get('/search', [ActivoController::class, 'search'])->name('search');
 
         Route::post(
@@ -60,6 +63,8 @@ Route::middleware(['auth'])->group(function () {
         )->name('print.frm23');
 
         Route::get('/{folio}/print/formato_baja', [ActivoController::class, 'printFormatoBaja'])->name('print.formato_baja');
+
+        Route::get('/{folio}/print', [ActivoController::class, 'printFormatoTraspaso'])->name('print.formato_traspaso');
 
         Route::get('/create', [ActivoController::class, 'create'])->name('create');
         Route::post('/', [ActivoController::class, 'store'])->name('store');

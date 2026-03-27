@@ -133,7 +133,7 @@
                                 </span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Estado anterior:</span>
+                                <span class="info-label">Estado Sist. anterior:</span>
                                 <span class="info-value">
                                     <span class="badge bg-warning text-dark">
                                         {{ $activo->estado_bien_old ?? 'N/A' }}
@@ -212,7 +212,7 @@
                                 <span class="info-value">{{ $activo->proveedor->nomcorto ?? '-' }}</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Proveedor anterior:</span>
+                                <span class="info-label">Proveedor Sist. anterior:</span>
                                 <span class="info-value">{{ $activo->proveedor_old }}</span>
                             </div>
                             <div class="info-row">
@@ -249,6 +249,12 @@
                                 <span class="info-label">Folio Entrada:</span>
                                 <span class="info-value">
                                     {{ $activo->folio_entrada ?: '-' }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Folio Salida:</span>
+                                <span class="info-value">
+                                    {{ $activo->folio_salida ?: '-' }}
                                 </span>
                             </div>
                             <div class="info-row">
@@ -289,7 +295,7 @@
                                 </span>
                             </div>
                                                         <div class="info-row">
-                                <span class="info-label">Empleado anterior:</span>
+                                <span class="info-label">Empleado Sist. anterior:</span>
                                 <span class="info-value">{{ $activo->empleado_old ?? '-' }}</span>
                             </div>
                             <div class="info-row">
@@ -315,7 +321,7 @@
                                 <span class="info-value">{{ $activo->ubr->descripcion ?? '-' }}</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">UBR anterior:</span>
+                                <span class="info-label">UBR Sist. anterior:</span>
                                 <span class="info-value">{{ $activo->ubr_old ?? '-' }}</span>
                             </div>
                             <div class="info-row">
@@ -323,7 +329,7 @@
                                 <span class="info-value">{{ $activo->eade->descripcion ?? '-' }}</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">EAD anterior:</span>
+                                <span class="info-label">EAD Sist. anterior:</span>
                                 <span class="info-value">{{ $activo->ead_old ?? '-' }}</span>
                             </div>
                         </div>

@@ -54,7 +54,8 @@ class Activo extends Model
         'fecha_baja',
         'motivo_baja',
         'status',
-        'fecha_traslado',
+        'fecha_traspaso',
+        'motivo_traspaso',
     ];
 
     protected $casts = [
@@ -66,7 +67,7 @@ class Activo extends Model
         'salida_almacen' => 'date',
         'fecha_asignacion' => 'date',
         'fecha_baja' => 'date',
-        'fecha_traslado' => 'date',
+        'fecha_traspaso' => 'date',
         'status' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -216,5 +217,21 @@ class Activo extends Model
             $q->where('descripcion_corta', 'LIKE', "%{$descripcion}%")
                 ->orWhere('descripcion_larga', 'LIKE', "%{$descripcion}%");
         });
+    }
+
+    public function traspasos()
+    {
+        return $this->hasMany(HistorialTraspaso::class, 'activo_id', 'folio');
+    }
+
+    public function ultimoTraspaso()
+    {
+        return $this->hasOne(HistorialTraspaso::class, 'activo_id', 'folio')
+            ->latest('fecha_traspaso');
+    }
+
+    public function empleadoAnterior()
+    {
+        return $this->belongsTo(CatalogoEmpleado::class, 'empleado_anterior_id');
     }
 }

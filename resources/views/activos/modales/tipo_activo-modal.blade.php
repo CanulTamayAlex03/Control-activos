@@ -93,4 +93,4 @@
 .bg-gradient {
     background: linear-gradient(135deg, #343a40 0%, #212529 100%);
 }
-</style>
+</style> 

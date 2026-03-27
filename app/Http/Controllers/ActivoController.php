@@ -191,16 +191,32 @@ class ActivoController extends Controller
                 return redirect()->route('activos.index')
                     ->with('error', 'Debe seleccionar un tipo de activo.');
             }
-            $ultimo = Activo::where('numero_inventario', 'like', $tipo . '%')
-                ->orderBy('numero_inventario', 'desc')
-                ->first();
-            if ($ultimo) {
-                $numero = (int) substr($ultimo->numero_inventario, strlen($tipo));
-                $siguiente = $numero + 1;
+
+            if ($tipo === 'BM') {
+                $maxNumero = Activo::where('numero_inventario', 'like', 'BM%')
+                    ->whereRaw('CAST(SUBSTRING(numero_inventario, 3) AS UNSIGNED) < 900000')
+                    ->get()
+                    ->map(function ($activo) {
+                        return (int)substr($activo->numero_inventario, 2);
+                    })
+                    ->max();
+
+                $baseManual = 13365;
+                $siguiente = max($maxNumero ?? 0, $baseManual) + 1;
             } else {
-                $siguiente = 1;
+                $maxNumero = Activo::where('numero_inventario', 'like', $tipo . '%')
+                    ->get()
+                    ->map(function ($activo) use ($tipo) {
+                        $parteNumerica = substr($activo->numero_inventario, strlen($tipo));
+                        return (int)$parteNumerica;
+                    })
+                    ->max();
+
+                $siguiente = ($maxNumero ?? 0) + 1;
             }
+
             $siguienteNumeroInventario = $tipo . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
+
             $valorUma = Parametro::where('id', 4)->value('valor_uma');
             $clasificaciones = CatalogoClasificacion::orderBy('descripcion')->get();
             $estadosBien = CatalogoEstadoBien::orderBy('descripcion')->get();
@@ -260,6 +276,7 @@ class ActivoController extends Controller
                 'numero_pedido' => 'nullable|string|max:50',
                 'entrada_almacen' => 'nullable|date',
                 'folio_entrada' => 'nullable|string|max:255',
+                'folio_salida' => 'nullable|string|max:255',
                 'salida_almacen' => 'nullable|date',
                 'observaciones' => 'nullable|string',
                 'es_donacion' => 'boolean',
@@ -275,16 +292,29 @@ class ActivoController extends Controller
 
             $prefijo = $request->tipo_activo;
 
-            $ultimo = Activo::where('numero_inventario', 'like', $prefijo . '%')
-                ->lockForUpdate()
-                ->orderBy('numero_inventario', 'desc')
-                ->first();
+            if ($prefijo === 'BM') {
+                $maxNumero = Activo::where('numero_inventario', 'like', 'BM%')
+                    ->whereRaw('CAST(SUBSTRING(numero_inventario, 3) AS UNSIGNED) < 900000')
+                    ->lockForUpdate()
+                    ->get()
+                    ->map(function ($activo) {
+                        return (int)substr($activo->numero_inventario, 2);
+                    })
+                    ->max();
 
-            if ($ultimo) {
-                $numero = (int) substr($ultimo->numero_inventario, strlen($prefijo));
-                $siguiente = $numero + 1;
+                $baseManual = 13365;
+                $siguiente = max($maxNumero ?? 0, $baseManual) + 1;
             } else {
-                $siguiente = 1;
+                $maxNumero = Activo::where('numero_inventario', 'like', $prefijo . '%')
+                    ->lockForUpdate()
+                    ->get()
+                    ->map(function ($activo) use ($prefijo) {
+                        $parteNumerica = substr($activo->numero_inventario, strlen($prefijo));
+                        return (int)$parteNumerica;
+                    })
+                    ->max();
+
+                $siguiente = ($maxNumero ?? 0) + 1;
             }
 
             $numeroInventario = $prefijo . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
@@ -430,6 +460,7 @@ class ActivoController extends Controller
                 'numero_pedido' => 'nullable|string|max:50',
                 'entrada_almacen' => 'nullable|date',
                 'folio_entrada' => 'nullable|string|max:255',
+                'folio_salida' => 'nullable|string|max:255',
                 'salida_almacen' => 'nullable|date',
                 'observaciones' => 'nullable|string',
                 'es_donacion' => 'boolean',
@@ -598,5 +629,137 @@ class ActivoController extends Controller
         ))->setPaper('letter', 'portrait');
 
         return $pdf->stream('formato_bajaAF-' . $activo->numero_inventario . '.pdf');
+    }
+
+    public function traspasosIndex(Request $request)
+    {
+        $activo = null;
+
+        if ($request->filled('search')) {
+            $activo = Activo::with(['empleado', 'departamento', 'edificio'])
+                ->where('numero_inventario', $request->search)
+                ->first();
+        }
+
+        $empleados = \App\Models\CatalogoEmpleado::orderBy('nombre')->get();
+        $departamentos = \App\Models\CatalogoDepartamento::orderBy('descripcion')->get();
+        $edificios = \App\Models\CatalogoEdificio::orderBy('descripcion')->get();
+
+        return view('activos.activo-traspasos', compact(
+            'activo',
+            'empleados',
+            'departamentos',
+            'edificios'
+        ));
+    }
+
+    public function darTraspaso(Request $request)
+    {
+        $request->validate([
+            'numero_inventario' => 'required|exists:activos,numero_inventario',
+            'empleado_id' => 'required|exists:catalogo_empleado,id',
+            'departamento_id' => 'required|exists:catalogo_departamento,id',
+            'edificio_id' => 'required|exists:catalogo_edificio,id',
+            'fecha_traspaso' => 'required|date',
+            'motivo_traspaso' => 'required|string|max:600',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $activo = Activo::where('numero_inventario', $request->numero_inventario)->firstOrFail();
+
+            if ($activo->fecha_baja) {
+                throw new \Exception('No se puede traspasar un activo dado de baja.');
+            }
+
+            if ($activo->empleado_id && $activo->empleado_id == $request->empleado_id) {
+                throw new \Exception('El activo ya está asignado a este empleado.');
+            }
+
+            $empleadoAnteriorId = $activo->empleado_id;
+            $departamentoAnteriorId = $activo->departamento_id;
+            $edificioAnteriorId = $activo->edificio_id;
+
+            \App\Models\HistorialTraspaso::create([
+                'activo_id' => $activo->folio,
+                'empleado_origen_id' => $empleadoAnteriorId,
+                'empleado_destino_id' => $request->empleado_id,
+                'departamento_origen_id' => $departamentoAnteriorId,
+                'departamento_id' => $request->departamento_id,
+                'edificio_id' => $request->edificio_id,
+                'fecha_traspaso' => $request->fecha_traspaso,
+                'motivo_traspaso' => $request->motivo_traspaso,
+            ]);
+
+            $activo->update([
+                'empleado_anterior_id' => $empleadoAnteriorId,
+                'empleado_id' => $request->empleado_id,
+                'departamento_id' => $request->departamento_id,
+                'edificio_id' => $request->edificio_id,
+                'fecha_traspaso' => $request->fecha_traspaso,
+                'motivo_traspaso' => $request->motivo_traspaso,
+                'fecha_asignacion' => is_null($empleadoAnteriorId) ? now() : $activo->fecha_asignacion,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Traspaso realizado correctamente',
+                'pdf_url' => route('activos.print.formato_traspaso', ['folio' => $activo->folio])
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function printFormatoTraspaso(Request $request, $folio)
+    {
+        $activo = Activo::with([
+            'proveedor',
+            'empleado',
+            'departamento',
+            'edificio',
+            'estadoBien',
+            'traspasos.empleadoOrigen',
+            'traspasos.departamentoOrigen'
+        ])->findOrFail($folio);
+
+        if (!$activo->fecha_traspaso) {
+            return redirect()->back()->with('error', 'Este activo no tiene registro de traspaso.');
+        }
+
+        $ultimoTraspaso = $activo->traspasos->last();
+
+        $empleadoOrigen = $ultimoTraspaso?->empleadoOrigen;
+        $departamentoOrigen = $ultimoTraspaso?->departamentoOrigen;
+
+        $empleadoDestino = $activo->empleado;
+        $departamentoDestino = $activo->departamento;
+        $edificioDestino = $activo->edificio;
+
+        $elaboro = Parametro::find(1);
+        $vobo    = Parametro::find(3);
+        $autorizo = Parametro::find(2);
+
+        $pdf = Pdf::loadView('activos.print.formato_traspaso', compact(
+            'activo',
+            'elaboro',
+            'vobo',
+            'autorizo',
+            'empleadoOrigen',
+            'empleadoDestino',
+            'departamentoOrigen',
+            'departamentoDestino',
+            'edificioDestino'
+        ))->setPaper('letter', 'portrait');
+
+        return $pdf->stream('formato_traspaso-' . $activo->numero_inventario . '.pdf');
     }
 }

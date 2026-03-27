@@ -62,10 +62,10 @@
                                         <input type="text" 
                                                name="numero_inventario" 
                                                id="numero_inventario"
-                                               class="form-control form-control-sm"
+                                               class="form-control form-control-sm fw-bold"
                                                value="{{ old('numero_inventario', $activo->numero_inventario) }}"
                                                required
-                                               placeholder="Ej: INV-2024-001">
+                                               readonly>
                                     </div>
                                 </div>
                             </div>
@@ -166,6 +166,10 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Sist. Anterior: {{ $activo->estado_bien_old ?? 'N/A' }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -314,6 +318,10 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Sist. Anterior: {{ $activo->proveedor_old ?? 'N/A' }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -393,6 +401,19 @@
                                     </div>
                                 </div>
                             </div>
+                             <div class="col-md-4">
+                                <div class="info-row">
+                                    <label class="info-label" for="folio_salida">Folio Salida:</label>
+                                    <div class="info-value">
+                                        <input type="text" 
+                                               name="folio_salida" 
+                                               id="folio_salida"
+                                               class="form-control form-control-sm"
+                                               value="{{ old('folio_salida', $activo->folio_salida) }}"
+                                               placeholder="Ej: FS-2024-001">
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <div class="info-row">
                                     <label class="info-label" for="salida_almacen">Salida Almacén:</label>
@@ -448,6 +469,10 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Sist. Anterior: {{ $activo->empleado_old ?? 'N/A' }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -533,6 +558,10 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Sist. Anterior: {{ $activo->ubr_old ?? 'N/A' }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -552,6 +581,10 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Sist. Anterior: {{ $activo->ead_old ?? '-' }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>

@@ -173,6 +173,7 @@ body {
 
 <br>
 
+
 <div class="donacion"><span class="label">Donación:</span> {{ $activo->es_donacion ? 'SI' : 'NO' }}</div>
 <div class="donacion"><span class="label">1. Datos del Donante:</span> {{ $activo->donante ?? '' }}</div>
 <div class="donacion"><span class="label">Observaciones:</span> {{ $activo->observaciones }}</div>

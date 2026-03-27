@@ -23,19 +23,20 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link bg-light border-0 rounded-top py-3 fw-semibold text-muted"
+                
                     style="cursor: default;"
                     disabled>
                     <i class="fa-solid fa-file-circle-xmark me-2"></i>
                     Bajas Múltiples
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link bg-light border-0 rounded-top py-3 fw-semibold text-muted"
-                    style="cursor: default;"
-                    disabled>
+            <li class="nav-item">
+                <a href="{{ route('activos.traspasos.index') }}"
+                   class="nav-link py-3 fw-semibold {{ request()->routeIs('activos.traspasos.index') ? 'active bg-white shadow-sm border-0 fw-semibold' : 'bg-light text-muted' }}"
+                   style="{{ request()->routeIs('activos.traspasos.index') ? 'color:#0d6efd; border-bottom:3px solid #0d6efd;' : '' }}">
                     <i class="fas fa-exchange-alt me-2"></i>
                     Traspasos Individuales
-                </button>
+                </a>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link bg-light border-0 rounded-top py-3 fw-semibold text-muted"
@@ -119,7 +120,7 @@
                         </div>
 
                         <div class="col-md-6 mb-2">
-                            <small class="info-label">Empleado anterior:</small><br>
+                            <small class="info-label">Empleado Sist. anterior:</small><br>
                             <span>{{ $activo->empleado_old ?? '-' }}</span>
                         </div>
 
