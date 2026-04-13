@@ -34,4 +34,6 @@ class CatalogoEmpleado extends Model
     {
         return $this->hasMany(Activo::class, 'empleado_id');
     }
+
+    
 }

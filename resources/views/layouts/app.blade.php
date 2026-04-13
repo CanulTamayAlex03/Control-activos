@@ -11,9 +11,8 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
-
     <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
-
+    @stack('styles')
 </head>
 
 <body>
@@ -46,7 +45,7 @@
                     <a href="{{ route('activos.index') }}" class="ps-4 d-block">
                         <i class="fas fa-box me-2"></i> Activo
                     </a>
-                    <a href="{{ route('activos.bajas.index') }}" class="ps-4 d-block">
+                    <a href="{{ route('activos.traspasos.index') }}" class="ps-4 d-block">
                         <i class="fas fa-rotate me-2"></i> Movimientos
                     </a>
                     <a href="{{ route('activos.activos_tipos') }}" class="ps-4 d-block">
@@ -207,6 +206,7 @@
     @stack('modals')
     @stack('scripts')
     @yield('scripts')
+    
 </body>
 
 </html>

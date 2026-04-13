@@ -9,9 +9,22 @@
                 <form id="addProveedorForm">
                     @csrf
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3 position-relative">
                             <label for="nomcorto" class="form-label">Nombre Corto *</label>
-                            <input type="text" class="form-control" id="nomcorto" name="nomcorto" required>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="nomcorto"
+                                name="nomcorto"
+                                required
+                                autocomplete="off">
+
+                            <div id="nomcortoList"
+                                class="list-group position-absolute w-100"
+                                style="z-index: 1055; max-height: 200px; overflow-y: auto;">
+                            </div>
+
                             <div class="invalid-feedback" id="nomcortoError"></div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -24,7 +37,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="rfc" class="form-label">RFC</label>
-                            <input type="text" class="form-control" id="rfc" name="rfc" maxlength="13">
+                            <input type="text"
+                                class="form-control"
+                                id="rfc"
+                                name="rfc"
+                                maxlength="13"
+                                style="text-transform: uppercase;"
+                                oninput="this.value = this.value.replace(/\s/g, '')">
                             <div class="invalid-feedback" id="rfcError"></div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -95,3 +114,4 @@
         </div>
     </div>
 </div>
+

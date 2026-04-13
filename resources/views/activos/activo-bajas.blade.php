@@ -10,44 +10,8 @@
         </div>
     </div>
 
-    {{-- Menú de navegación tipo tabs (solo diseño) --}}
-    <div class="mb-4">
-        <ul class="nav nav-tabs nav-fill border-0" style="gap: 2px;" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active bg-white shadow-sm border-0 rounded-top py-3 fw-semibold"
-                    style="color: #0d6efd; border-bottom: 3px solid #0d6efd;"
-                    disabled>
-                    <i class="fa-solid fa-file-circle-minus me-2"></i>
-                    Bajas Individuales
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link bg-light border-0 rounded-top py-3 fw-semibold text-muted"
-                
-                    style="cursor: default;"
-                    disabled>
-                    <i class="fa-solid fa-file-circle-xmark me-2"></i>
-                    Bajas Múltiples
-                </button>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('activos.traspasos.index') }}"
-                   class="nav-link py-3 fw-semibold {{ request()->routeIs('activos.traspasos.index') ? 'active bg-white shadow-sm border-0 fw-semibold' : 'bg-light text-muted' }}"
-                   style="{{ request()->routeIs('activos.traspasos.index') ? 'color:#0d6efd; border-bottom:3px solid #0d6efd;' : '' }}">
-                    <i class="fas fa-exchange-alt me-2"></i>
-                    Traspasos Individuales
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link bg-light border-0 rounded-top py-3 fw-semibold text-muted"
-                    style="cursor: default;"
-                    disabled>
-                    <i class="fas fa-random me-2"></i>
-                    Traspasos Múltiples
-                </button>
-            </li>
-        </ul>
-    </div>
+    {{-- Menú de navegación --}}
+    @include('activos.partials.menu-movimientos')
 
     {{-- Barra de búsqueda --}}
     <div class="card border-0 shadow-sm mb-4">
@@ -70,10 +34,8 @@
         </div>
     </div>
 
-    {{-- Resultado de la búsqueda --}}
     @if($activo)
     <div class="card border-0 shadow-lg">
-        {{-- Cabecera del activo --}}
         <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-semibold">
@@ -88,10 +50,8 @@
         </div>
 
         <div class="card-body p-4">
-            {{-- Información básica del activo --}}
             <div class="bg-light rounded-3 p-3 mb-4">
 
-                <!-- PRINCIPAL -->
                 <div class="mb-3 text-center">
                     <div class="fw-bold fs-4">
                         {{ $activo->numero_inventario }}
@@ -101,7 +61,6 @@
                     </div>
                 </div>
 
-                <!-- INFO GENERAL -->
                 <div class="row mb-2">
                     <div class="col-md-6">
                         <small class="info-label">Rubro:</small><br>
@@ -109,7 +68,6 @@
                     </div>
                 </div>
 
-                <!-- ASIGNACIÓN -->
                 <div class="mt-3">
                     <small class="text-muted d-block mb-2"><strong>Asignación</strong></small>
 
@@ -141,7 +99,6 @@
             </div>
 
             @if($activo->fecha_baja)
-            {{-- Mensaje de activo ya dado de baja con botón para formato --}}
             <div class="alert alert-danger bg-danger bg-opacity-10 border-0 d-flex align-items-center justify-content-between" role="alert">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-exclamation-circle fs-4 me-3"></i>
@@ -151,7 +108,6 @@
                     </div>
                 </div>
             </div>
-            {{-- BOTÓN PARA DESCARGAR FORMATO DE BAJA --}}
             <div class="text-end">
                 <button type="button"
                     class="btn btn-success btn-sm"
@@ -252,7 +208,6 @@
 <style>
     .nav-tabs .nav-link {
         transition: all 0.2s ease;
-        pointer-events: none;
     }
 
     .nav-tabs .nav-link.active {

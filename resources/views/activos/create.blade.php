@@ -25,7 +25,6 @@
             @csrf
 
             <div class="card-body p-2">
-                <!-- Mensajes de error -->
                 @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>+
@@ -39,7 +38,6 @@
                 </div>
                 @endif
 
-                <!-- Información General -->
                 <div class="section-card mb-1">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -211,7 +209,6 @@
                     </div>
                 </div>
 
-                <!-- Características Físicas -->
                 <div class="section-card mb-1">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -287,7 +284,6 @@
                     </div>
                 </div>
 
-                <!-- Información de Compra y Almacén -->
                 <div class="section-card mb-1">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -300,17 +296,30 @@
                                 <div class="info-row">
                                     <label class="info-label" for="proveedor_id">Proveedor:</label>
                                     <div class="info-value">
-                                        <select name="proveedor_id"
-                                            id="proveedor_id"
-                                            class="form-select form-select-sm">
-                                            <option value="">Seleccionar...</option>
-                                            @foreach($proveedores as $proveedor)
-                                            <option value="{{ $proveedor->id }}"
-                                                {{ old('proveedor_id') == $proveedor->id ? 'selected' : '' }}>
-                                                {{ $proveedor->nomcorto }}
-                                            </option>
-                                            @endforeach
-                                        </select>
+                                        <div class="input-group">
+                                            <select name="proveedor_id"
+                                                id="proveedor_id"
+                                                class="form-select form-select-sm select2"
+                                                style="width: 100%;">
+                                                <option value="">Seleccionar...</option>
+                                                @foreach($proveedores as $proveedor)
+                                                <option value="{{ $proveedor->id }}"
+                                                    {{ old('proveedor_id') == $proveedor->id ? 'selected' : '' }}>
+                                                    {{ $proveedor->nomcorto }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            <button type="button" 
+                                                class="btn btn-link text-success p-0 ms-1" 
+                                                id="btnAddProveedor"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#addProveedorModal"
+                                                title="Agregar nuevo proveedor"
+                                                style="text-decoration: none; font-size: 1rem; font-size:small;">
+                                                <i class="fas fa-plus-circle"></i>
+                                                agregar
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -432,7 +441,6 @@
                     </div>
                 </div>
 
-                <!-- Asignación y Ubicación -->
                 <div class="section-card">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -447,7 +455,7 @@
                                     <div class="info-value">
                                         <select name="empleado_id"
                                             id="empleado_id"
-                                            class="form-select form-select-sm">
+                                            class="form-select form-select-sm select2">
                                             <option value="">No asignado</option>
                                             @foreach($empleados as $empleado)
                                             <option value="{{ $empleado->id }}"
@@ -480,7 +488,7 @@
                                     <div class="info-value">
                                         <select name="edificio_id"
                                             id="edificio_id"
-                                            class="form-select form-select-sm">
+                                            class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($edificios as $edificio)
                                             <option value="{{ $edificio->id }}"
@@ -499,7 +507,7 @@
                                     <div class="info-value">
                                         <select name="departamento_id"
                                             id="departamento_id"
-                                            class="form-select form-select-sm">
+                                            class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($departamentos as $departamento)
                                             <option value="{{ $departamento->id }}"
@@ -517,7 +525,7 @@
                                     <div class="info-value">
                                         <select name="direccion_id"
                                             id="direccion_id"
-                                            class="form-select form-select-sm">
+                                            class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($direcciones as $direccion)
                                             <option value="{{ $direccion->id }}"
@@ -535,7 +543,7 @@
                                     <div class="info-value">
                                         <select name="ubr_id"
                                             id="ubr_id"
-                                            class="form-select form-select-sm">
+                                            class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($ubrs as $ubr)
                                             <option value="{{ $ubr->id }}"
@@ -554,7 +562,7 @@
                                     <div class="info-value">
                                         <select name="eade_id"
                                             id="eade_id"
-                                            class="form-select form-select-sm">
+                                            class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($eades as $eade)
                                             <option value="{{ $eade->id }}"
@@ -690,128 +698,247 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
 </style>
+@push('modals')
+@include('catalogos.modales.proveedor_add')
+@endpush
 
 @section('scripts')
 @include('activos.scripts.activos_create_script')
 
-// resources/views/activos/scripts/activos_create_script.js
 <script>
-
 $(document).ready(function() {
-    $('select').each(function() {
-        var $select = $(this);
-        
-        var originalClass = $select.attr('class');
-        var isSmall = originalClass && originalClass.includes('form-select-sm');
-        
-        // Inicializar Select2 con configuración personalizada
-        $select.select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Seleccionar...',
-            allowClear: true,
-            dropdownAutoWidth: true,
-            // Personalizar el tamaño
-            containerCssClass: isSmall ? 'select2-container--bootstrap-5 select2-container--small' : 'select2-container--bootstrap-5',
-            dropdownCssClass: isSmall ? 'select2-dropdown--small' : ''
-        });
+    $('.select2').select2({
+        placeholder: function(){
+            return $(this).attr('data-placeholder') || 'Seleccionar...';
+        },
+        allowClear: true,
+        width: '100%'
+    });
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
     });
 
-    // Personalizar el estilo de Select2 para que coincida con Bootstrap
-    $('select').on('select2:open', function() {
-        // Ajustar el dropdown para que sea más legible
-        $('.select2-container--bootstrap-5 .select2-dropdown').css({
-            'font-size': '0.82rem',
-            'border-radius': '0.375rem',
-            'border-color': '#dee2e6'
-        });
+    $('#saveProveedorBtn').on('click', function() {
+        var $btn = $(this);
+        var originalText = $btn.html();
         
-        $('.select2-container--bootstrap-5 .select2-search__field').css({
-            'font-size': '0.82rem',
-            'padding': '0.15rem 0.5rem',
-            'border-radius': '0.2rem',
-            'border': '1px solid #dee2e6'
-        });
+        var nomcorto = $('#nomcorto').val();
+        var telefono1 = $('#telefono1').val();
+        if (!nomcorto) {
+            alert('El campo Nombre Corto es requerido');
+            $('#nomcorto').focus();
+            return;
+        }
         
-        $('.select2-container--bootstrap-5 .select2-results__option').css({
-            'font-size': '0.82rem',
-            'padding': '0.25rem 0.5rem'
-        });
+        if (!telefono1) {
+            alert('El campo Teléfono 1 es requerido');
+            $('#telefono1').focus();
+            return;
+        }
+        $btn.prop('disabled', true);
+        $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Guardando...');
         
-        // Para selects pequeños
-        $('.select2-container--small .select2-selection').css({
-            'min-height': '31px',
-            'font-size': '0.82rem'
-        });
-        
-        $('.select2-container--small .select2-selection--single .select2-selection__rendered').css({
-            'line-height': '29px',
-            'font-size': '0.82rem'
-        });
-        
-        $('.select2-container--small .select2-selection--single .select2-selection__arrow').css({
-            'height': '29px'
-        });
-    });
+        var formData = $('#addProveedorForm').serialize();
 
-    // Resto de tu código...
-    $('#rubro_id').on('change', function() {
-        var rubroId = $(this).val();
-        
-        if (rubroId) {
-            $.ajax({
-                url: '/activos/get-subrubros/' + rubroId,
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    $('#subrubro_id').empty();
-                    $('#subrubro_id').append('<option value="">Seleccionar...</option>');
+        console.log('Enviando datos:', formData);
+
+        $.ajax({
+            url: '{{ route("catalogos.proveedores.store") }}',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log('Respuesta exitosa:', response);
+
+                if (response.success) {
+
+                    const modalElement = document.getElementById('addProveedorModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    setTimeout(function () {
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                    }, 300);
+
+                    $('#addProveedorForm')[0].reset();
+                    $('.is-invalid').removeClass('is-invalid');
+                    $('.invalid-feedback').html('');
                     
-                    $.each(data, function(key, value) {
-                        $('#subrubro_id').append('<option value="' + value.id + '">' + value.descripcion + '</option>');
+                    var alertHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-check-circle me-2"></i>' + response.message +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                        '</div>';
+                    $('.card-body').prepend(alertHtml);
+                    
+                    setTimeout(function() {
+                        $('.alert').alert('close');
+                    }, 3000);
+                    
+                    actualizarSelectProveedores();
+                }
+            },
+            error: function(xhr) {
+                console.error('Error en la petición:', xhr);
+                
+                if (xhr.status === 422) {
+                    var errors = xhr.responseJSON.errors;
+                    $('.invalid-feedback').html('');
+                    $('.is-invalid').removeClass('is-invalid');
+
+                    $.each(errors, function(field, messages) {
+                        var input = $('#addProveedorForm [name="' + field + '"]');
+                        input.addClass('is-invalid');
+                        $('#' + field + 'Error').html(messages[0]);
                     });
                     
-                    $('#subrubro_id').trigger('change');
+                    $('.is-invalid:first').focus();
+                } else {
+                    var errorMsg = 'Ocurrió un error al guardar. ';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg += xhr.responseJSON.message;
+                    } else {
+                        errorMsg += 'Revisa la consola para más detalles.';
+                    }
+                    alert(errorMsg);
+                }
+            },
+            complete: function() {
+                console.log('Petición completada');
+                $btn.prop('disabled', false);
+                $btn.html(originalText);
+            }
+        });
+    });
+
+    function actualizarSelectProveedores() {
+        console.log('Actualizando select de proveedores...');
+        
+        $.ajax({
+            url: '{{ route("catalogos.proveedores.select-list") }}',
+            type: 'GET',
+            dataType: 'json',
+            success: function(proveedores) {
+                console.log('Proveedores recibidos:', proveedores);
+                
+                var selectProveedor = $('#proveedor_id');
+                var currentValue = selectProveedor.val();
+                
+                var selectedText = selectProveedor.find('option:selected').text();
+                
+                selectProveedor.empty();
+                selectProveedor.append('<option value="">Seleccionar proveedor...</option>');
+                
+                if (proveedores && proveedores.length > 0) {
+                    $.each(proveedores, function(index, proveedor) {
+                        var optionText = proveedor.nomcorto;
+                        if (proveedor.rfc) {
+                            optionText += ' (' + proveedor.rfc + ')';
+                        }
+                        selectProveedor.append('<option value="' + proveedor.id + '">' + 
+                            optionText + 
+                            '</option>');
+                    });
+                }
+                
+                var nuevoProveedorId = null;
+                if (proveedores && proveedores.length > 0) {
+                    nuevoProveedorId = Math.max.apply(Math, proveedores.map(function(p) { return p.id; }));
+                }
+                
+                console.log('Valor actual:', currentValue, 'Nuevo ID:', nuevoProveedorId);
+                
+                if (nuevoProveedorId && (!currentValue || nuevoProveedorId > parseInt(currentValue))) {
+                    selectProveedor.val(nuevoProveedorId);
+                    console.log('Seleccionando nuevo proveedor:', nuevoProveedorId); 
+                } 
+                else if (currentValue && selectProveedor.find('option[value="' + currentValue + '"]').length) {
+                    selectProveedor.val(currentValue);
+                }
+                
+                if (typeof selectProveedor.select2 === 'function') {
+                    selectProveedor.trigger('change');
+                }
+                
+                console.log('Select actualizado. Valor final:', selectProveedor.val()); 
+            },
+            error: function(xhr) {
+                console.error('Error al actualizar proveedores:', xhr);
+                console.error('Status:', xhr.status);
+                console.error('Response:', xhr.responseText);
+                
+                var errorHtml = '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
+                    '<i class="fas fa-exclamation-triangle me-2"></i>' +
+                    'No se pudieron cargar los proveedores. Por favor, recarga la página para ver los cambios.' +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                    '</div>';
+                $('.card-body').prepend(errorHtml);
+            }
+        });
+    }
+
+    $('#addProveedorModal').on('hidden.bs.modal', function() {
+        console.log('Modal cerrado, limpiando formulario');
+        $('#addProveedorForm')[0].reset();
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').html('');
+        $('#nomcortoList').empty();
+    });
+
+    let searchTimeout;
+    $(document).on('keyup', '#nomcorto', function() {
+        let query = $(this).val();
+
+        if (query.length < 2) {
+            $('#nomcortoList').empty();
+            return;
+        }
+        
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            $.ajax({
+                url: '{{ route("catalogos.proveedores.search") }}',
+                data: {
+                    q: query
+                },
+                success: function(data) {
+                    let list = '';
+                    if (data && data.length > 0) {
+                        data.forEach(function(item) {
+                            list += `<button type="button" class="list-group-item list-group-item-action">${item}</button>`;
+                        });
+                    } else {
+                        list = '<div class="list-group-item text-muted">No se encontraron resultados</div>';
+                    }
+                    $('#nomcortoList').html(list);
+                },
+                error: function() {
+                    $('#nomcortoList').html('<div class="list-group-item text-danger">Error al buscar</div>');
                 }
             });
-        } else {
-            $('#subrubro_id').empty();
-            $('#subrubro_id').append('<option value="">Seleccionar...</option>');
-            $('#subrubro_id').trigger('change');
-        }
+        }, 300);
     });
 
-    $('#rubro_id').on('change', function() {
-        var rubroId = $(this).val();
-        if (rubroId == 5) {
-            $('#clasificacion-group').show();
-            $('#clasificacion_id').prop('required', true);
-        } else {
-            $('#clasificacion-group').hide();
-            $('#clasificacion_id').prop('required', false);
-            $('#clasificacion_id').val('').trigger('change');
-        }
+    $(document).on('click', '#nomcortoList button', function() {
+        $('#nomcorto').val($(this).text());
+        $('#nomcortoList').empty();
     });
 
-    $('input[name="es_donacion"]').on('change', function() {
-        if ($(this).val() == '1') {
-            $('#donante-field').show();
-            $('#donante').prop('required', true);
-        } else {
-            $('#donante-field').hide();
-            $('#donante').prop('required', false);
-            $('#donante').val('');
+    $(document).click(function(e) {
+        if (!$(e.target).closest('#nomcorto').length) {
+            $('#nomcortoList').empty();
         }
     });
-
-    if ($('#rubro_id').val()) {
-        $('#rubro_id').trigger('change');
-    }
-
-    if ($('input[name="es_donacion"]:checked').val() == '1') {
-        $('#donante-field').show();
-        $('#donante').prop('required', true);
-    }
+    
+    $('#addProveedorForm').on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('#saveProveedorBtn').click();
+        }
+    });
 });
 </script>
 @endsection

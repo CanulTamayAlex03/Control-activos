@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\PermisosController;
 use App\Http\Controllers\ActivoController;
+use App\Http\Controllers\TraspasoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ParametroController;
 use App\Http\Controllers\EdificioController;
@@ -75,6 +76,17 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/subrubros-por-rubro/{rubroId}', [ActivoController::class, 'getSubrubrosPorRubro'])
             ->name('subrubros.por.rubro');
+
+        // Traspasos múltiples
+        Route::get('/traspasos/multiples', [ActivoController::class, 'traspasosMultiplesIndex'])
+            ->name('traspasos.multiples.index');
+        Route::get('/traspasos/multiples/activos', [ActivoController::class, 'getActivosPorOrigen'])
+            ->name('traspasos.multiples.activos');
+        Route::post('/traspasos/multiples', [ActivoController::class, 'traspasosMultiplesStore'])
+            ->name('traspasos.multiples.store');
+
+        Route::get('/empleado-info/{id}', [ActivoController::class, 'getEmpleadoInfo'])
+            ->name('activos.empleado.info');
     });
 
     Route::prefix('herramienta-menor')
@@ -131,6 +143,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/proveedores', [ProveedorController::class, 'index'])->name('proveedores');
         Route::post('/proveedores', [ProveedorController::class, 'store'])->name('proveedores.store');
         Route::put('/proveedores/{id}', [ProveedorController::class, 'update'])->name('proveedores.update');
+        Route::get('/proveedores/search', [ProveedorController::class, 'search'])->name('proveedores.search');
+
+        Route::get('/proveedores/select-list', [ProveedorController::class, 'getSelectList'])->name('proveedores.select-list');
     });
 
 

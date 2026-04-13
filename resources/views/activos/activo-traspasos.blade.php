@@ -10,40 +10,8 @@
         </div>
     </div>
 
-    <div class="mb-4">
-        <ul class="nav nav-tabs nav-fill border-0" style="gap: 2px;">
-            
-            <li class="nav-item">
-                <a href="{{ route('activos.bajas.index') }}"
-                   class="nav-link bg-light text-muted border-0 rounded-top py-3 fw-semibold">
-                    <i class="fa-solid fa-file-circle-minus me-2"></i>
-                    Bajas Individuales
-                </a>
-            </li>
+    @include('activos.partials.menu-movimientos')
 
-            <li class="nav-item">
-                <button class="nav-link bg-light text-muted border-0 rounded-top py-3 fw-semibold" disabled>
-                    Bajas Múltiples
-                </button>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link active bg-white shadow-sm border-0 rounded-top py-3 fw-semibold"
-                   style="color: #0d6efd; border-bottom: 3px solid #0d6efd;">
-                    <i class="fas fa-exchange-alt me-2"></i>
-                    Traspasos Individuales
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <button class="nav-link bg-light text-muted border-0 rounded-top py-3 fw-semibold" disabled>
-                    Traspasos Múltiples
-                </button>
-            </li>
-        </ul>
-    </div>
-
-    {{-- Mostrar mensaje de éxito con botón para descargar formato --}}
     @if(session('success') && isset($activo) && $activo->fecha_traspaso)
     <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
         <div class="d-flex align-items-center">
@@ -66,7 +34,7 @@
     </div>
     @endif
 
-    {{-- Mostrar mensajes de error si existen --}}
+    {{-- mensajes de error --}}
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
         <div class="d-flex align-items-center">
@@ -97,7 +65,6 @@
         </div>
     </div>
 
-    {{-- Mensaje cuando no se ha realizado ninguna búsqueda --}}
     @if(!request('search'))
     <div class="text-center py-5">
         <div class="mb-3">
@@ -107,7 +74,6 @@
         <p class="text-muted">Ingrese un número de inventario para comenzar</p>
     </div>
     @elseif(!$activo)
-    {{-- Mensaje cuando no se encuentra el activo --}}
     <div class="text-center py-5">
         <div class="mb-3">
             <i class="fas fa-search fa-4x text-muted opacity-50"></i>
@@ -119,7 +85,6 @@
         </a>
     </div>
     @elseif($activo->fecha_baja)
-    {{-- Mensaje cuando el activo está dado de baja --}}
     <div class="card border-0 shadow-lg">
         <div class="card-body text-center py-5">
             <div class="mb-3">
@@ -138,12 +103,10 @@
         </div>
     </div>
     @else
-    {{-- Activo válido para traspaso --}}
     <div class="card shadow-lg">
         <div class="card-body">
 
-            {{-- INFO ACTUAL --}}
-            <div class="bg-light p-3 rounded mb-4">
+        <div class="bg-light p-3 rounded mb-4">
                 <div class="row align-items-center mb-3">
                     <div class="col">
                         <h5 class="mb-1">{{ $activo->numero_inventario }}</h5>

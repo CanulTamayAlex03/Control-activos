@@ -22,7 +22,7 @@
                 messageDiv.innerHTML = `
                     <small class="text-success">
                         <i class="fas fa-check-circle me-1"></i>
-                        <strong>Costo mayor o igual a UMA</strong><br>
+                        <strong>Mayor o igual a costo base</strong><br>
                     </small>
                 `;
             } else {
@@ -31,7 +31,7 @@
                 messageDiv.innerHTML = `
                     <small class="text-danger">
                         <i class="fas fa-exclamation-circle me-1"></i>
-                        <strong>Costo menor a UMA</strong><br>
+                        <strong>Menor a costo base</strong><br>
                     </small>
                 `;
             }

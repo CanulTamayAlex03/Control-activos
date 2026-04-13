@@ -25,7 +25,6 @@
             @method('PUT')
             
             <div class="card-body p-2">
-                <!-- Mensajes de error -->
                 @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
@@ -46,7 +45,6 @@
                 </div>
                 @endif
 
-                <!-- Información General -->
                 <div class="section-card mb-1">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -217,7 +215,6 @@
                     </div>
                 </div>
 
-                <!-- Características Físicas -->
                 <div class="section-card mb-1">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -294,7 +291,6 @@
                     </div>
                 </div>
 
-                <!-- Información de Compra y Almacén -->
                 <div class="section-card mb-1">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -309,7 +305,7 @@
                                     <div class="info-value">
                                         <select name="proveedor_id" 
                                                 id="proveedor_id"
-                                                class="form-select form-select-sm">
+                                                class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($proveedores as $proveedor)
                                                 <option value="{{ $proveedor->id }}"
@@ -442,7 +438,6 @@
                     </div>
                 </div>
 
-                <!-- Asignación y Ubicación -->
                 <div class="section-card">
                     <div class="section-header">
                         <h6 class="mb-0">
@@ -457,7 +452,7 @@
                                     <div class="info-value">
                                         <select name="empleado_id" 
                                                 id="empleado_id"
-                                                class="form-select form-select-sm">
+                                                class="form-select form-select-sm select2">
                                             <option value="">No asignado</option>
                                             @foreach($empleados as $empleado)
                                                 <option value="{{ $empleado->id }}"
@@ -494,7 +489,7 @@
                                     <div class="info-value">
                                         <select name="edificio_id" 
                                                 id="edificio_id"
-                                                class="form-select form-select-sm">
+                                                class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($edificios as $edificio)
                                                 <option value="{{ $edificio->id }}"
@@ -513,7 +508,7 @@
                                     <div class="info-value">
                                         <select name="departamento_id" 
                                                 id="departamento_id"
-                                                class="form-select form-select-sm">
+                                                class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($departamentos as $departamento)
                                                 <option value="{{ $departamento->id }}"
@@ -531,7 +526,7 @@
                                     <div class="info-value">
                                         <select name="direccion_id" 
                                                 id="direccion_id"
-                                                class="form-select form-select-sm">
+                                                class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($direcciones as $direccion)
                                                 <option value="{{ $direccion->id }}"
@@ -549,7 +544,7 @@
                                     <div class="info-value">
                                         <select name="ubr_id" 
                                                 id="ubr_id"
-                                                class="form-select form-select-sm">
+                                                class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($ubrs as $ubr)
                                                 <option value="{{ $ubr->id }}"
@@ -572,7 +567,7 @@
                                     <div class="info-value">
                                         <select name="eade_id" 
                                                 id="eade_id"
-                                                class="form-select form-select-sm">
+                                                class="form-select form-select-sm select2">
                                             <option value="">Seleccionar...</option>
                                             @foreach($eades as $eade)
                                                 <option value="{{ $eade->id }}"
@@ -709,5 +704,19 @@
 
 @section('scripts')
 @include('activos.scripts.activos_edit_script')
+
+<script>
+$(document).ready(function () {
+
+    $('.select2').select2({
+        placeholder: function(){
+            return $(this).attr('data-placeholder') || 'Seleccionar...';
+        },
+        allowClear: true,
+        width: '100%'
+    });
+
+});
+</script>
 @endsection
 @endsection

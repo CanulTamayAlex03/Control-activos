@@ -241,13 +241,7 @@
             this.classList.remove('is-invalid');
         });
         
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('togglePasswordBtn').click();
-            }
-        });
-        
+              
         document.addEventListener('DOMContentLoaded', function() {
             const emailInput = document.getElementById('email');
             if (emailInput && !emailInput.value) {

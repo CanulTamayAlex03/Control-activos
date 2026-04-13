@@ -14,12 +14,12 @@ class ProveedorController extends Controller
 
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nomcorto', 'LIKE', "%{$search}%")
-                  ->orWhere('rz', 'LIKE', "%{$search}%")
-                  ->orWhere('rfc', 'LIKE', "%{$search}%")
-                  ->orWhere('telefono1', 'LIKE', "%{$search}%")
-                  ->orWhere('telefono2', 'LIKE', "%{$search}%");
+                    ->orWhere('rz', 'LIKE', "%{$search}%")
+                    ->orWhere('rfc', 'LIKE', "%{$search}%")
+                    ->orWhere('telefono1', 'LIKE', "%{$search}%")
+                    ->orWhere('telefono2', 'LIKE', "%{$search}%");
             });
         }
 
@@ -38,20 +38,29 @@ class ProveedorController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nomcorto' => 'required|string|max:255',
-            'rz' => 'nullable|string|max:255',
-            'rfc' => 'nullable|string|max:50',
-            'domicilio' => 'nullable|string|max:255',
-            'ciudad' => 'nullable|string|max:100',
-            'estado' => 'nullable|string|max:50',
-            'fecha_alta' => 'nullable|date',
-            'telefono1' => 'required|string|max:10',
-            'telefono2' => 'nullable|string|max:10',
-            'dcredito' => 'nullable|integer',
-            'lcredito' => 'nullable|integer',
-            'grupo' => 'nullable|integer',
+        $request->merge([
+            'rfc' => $request->rfc ? strtoupper(str_replace(' ', '', trim($request->rfc))) : null,
         ]);
+        $request->validate(
+            [
+                'nomcorto' => 'required|string|max:255',
+                'rz' => 'nullable|string|max:255|unique:catalogo_proveedor,rz',
+                'rfc' => 'nullable|string|max:13|regex:/^[A-Z0-9]+$/|unique:catalogo_proveedor,rfc',
+                'domicilio' => 'nullable|string|max:255',
+                'ciudad' => 'nullable|string|max:100',
+                'estado' => 'nullable|string|max:50',
+                'fecha_alta' => 'nullable|date',
+                'telefono1' => 'required|string|max:10',
+                'telefono2' => 'nullable|string|max:10',
+                'dcredito' => 'nullable|integer',
+                'lcredito' => 'nullable|integer',
+                'grupo' => 'nullable|integer',
+            ],
+            [
+                'rfc.unique' => 'El RFC ya está registrado',
+                'rz.unique' => 'La razón social ya está registrada',
+            ]
+        );
 
         CatalogoProveedor::create([
             'nomcorto' => $request->nomcorto,
@@ -161,6 +170,16 @@ class ProveedorController extends Controller
         $proveedores = CatalogoProveedor::where('status', 1)
             ->orderBy('nomcorto')
             ->get(['id', 'nomcorto', 'rz', 'rfc']);
+
+        return response()->json($proveedores);
+    }
+    public function search(Request $request)
+    {
+        $query = $request->q;
+
+        $proveedores = CatalogoProveedor::where('nomcorto', 'LIKE', "%{$query}%")
+            ->limit(10)
+            ->pluck('nomcorto');
 
         return response()->json($proveedores);
     }

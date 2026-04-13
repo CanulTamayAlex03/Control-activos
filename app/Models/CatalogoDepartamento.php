@@ -38,7 +38,7 @@ class CatalogoDepartamento extends Model
 
     public function activos()
     {
-        return $this->hasMany(Activo::class, 'departamento_id');
+        return $this->hasMany(Activo::class, 'departamento_id', 'id');
     }
 
     public function empleados()
