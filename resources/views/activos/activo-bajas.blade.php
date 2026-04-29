@@ -13,22 +13,39 @@
     {{-- Menú de navegación --}}
     @include('activos.partials.menu-movimientos')
 
-    {{-- Barra de búsqueda --}}
+    {{-- Barra de búsqueda con Select2 --}}
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('activos.bajas.index') }}">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
-                        <i class="fas fa-search text-muted"></i>
-                    </span>
-                    <input type="text"
-                        name="search"
-                        class="form-control border-start-0 ps-0"
-                        placeholder="Buscar por número de inventario..."
-                        value="{{ request('search') }}">
-                    <button class="btn btn-primary" type="submit">
-                        Buscar
-                    </button>
+            <form method="GET" action="{{ route('activos.bajas.index') }}" id="formBusquedaBaja">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <select class="form-select" 
+                                id="buscarActivoBaja" 
+                                name="search"
+                                style="width: 100%;">
+                            @if(request('search') && $activo)
+                                <option value="{{ $activo->numero_inventario }}" selected>
+                                    {{ $activo->numero_inventario }} - {{ $activo->descripcion_corta }}
+                                </option>
+                            @endif
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
+                    </div>
+                    @if(request('search'))
+                    <div class="col-auto">
+                        <a href="{{ route('activos.bajas.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Limpiar
+                        </a>
+                    </div>
+                    @endif
+                </div>
+                <div class="form-text mt-2">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Busque por número de inventario, descripción, serie, marca o modelo
                 </div>
             </form>
         </div>
@@ -74,7 +91,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <small class="info-label">Empleado:</small><br>
-                            <span>{{ $activo->empleado->no_nomi ?? '-' }}</span>
+                            <span>{{ $activo->empleado->nombre ?? '-' }}</span>
                         </div>
 
                         <div class="col-md-6 mb-2">
@@ -246,11 +263,58 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const fecha = document.getElementById('fecha_baja');
-        const motivo = document.getElementById('motivo_baja');
-        const boton = document.getElementById('btnDarBaja');
+$(document).ready(function() {
+    $('#buscarActivoBaja').select2({
+        placeholder: "Buscar por número de inventario o descripción...",
+        allowClear: true,
+        width: '100%',
+        minimumInputLength: 2,
+        language: {
+            inputTooShort: function(args) {
+                return "Ingrese al menos " + args.minimum + " caracteres";
+            },
+            searching: function() {
+                return "Buscando...";
+            },
+            noResults: function() {
+                return "No se encontraron activos";
+            }
+        },
+        ajax: {
+            url: '{{ route("activos.search") }}',
+            dataType: 'json',
+            delay: 300,
+            data: function(params) {
+                return {
+                    search: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.results
+                };
+            },
+            cache: true
+        }
+    });
+    
+    $(document).on('select2:open', '#buscarActivoBaja', function(e) {
+        setTimeout(function() {
+            document.querySelector('.select2-container--open .select2-search__field').focus();
+        }, 10);
+    });
+    
+    $('#buscarActivoBaja').on('change', function() {
+        if ($(this).val()) {
+            $('#formBusquedaBaja').submit();
+        }
+    });
 
+    const fecha = document.getElementById('fecha_baja');
+    const motivo = document.getElementById('motivo_baja');
+    const boton = document.getElementById('btnDarBaja');
+
+    if (fecha && motivo && boton) {
         function validarCampos() {
             if (fecha.value && motivo.value.trim() !== '') {
                 boton.disabled = false;
@@ -261,8 +325,8 @@
 
         fecha.addEventListener('change', validarCampos);
         motivo.addEventListener('input', validarCampos);
-
         validarCampos();
-    });
+    }
+});
 </script>
 @endpush

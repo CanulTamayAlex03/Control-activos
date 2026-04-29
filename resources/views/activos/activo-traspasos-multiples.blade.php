@@ -1,6 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999; margin-top: 20px; margin-right: 20px;">
+    <div id="toastNotificacion" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-bell me-2"></i>
+            <strong class="me-auto">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            <div id="toastMensaje"></div>
+            <div id="toastErrores" style="display: none;">
+                <hr class="my-2">
+                <strong><i class="fas fa-exclamation-circle me-2 text-danger"></i>Errores:</strong>
+                <ul id="toastListaErrores" class="mt-2 mb-0"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container py-4">
 
     <div class="d-flex align-items-center mb-4">
@@ -78,9 +96,14 @@
                                         <i class="fas fa-calendar-alt me-2 text-muted"></i>
                                         Fecha de traspaso *
                                     </label>
-                                    <input type="date" name="fecha_traspaso" id="modalFechaTraspaso" class="form-control" value="{{ date('Y-m-d') }}" required>
+                                    <input type="date" 
+                                           name="fecha_traspaso" 
+                                           id="modalFechaTraspaso" 
+                                           class="form-control" 
+                                           value="{{ date('Y-m-d') }}" 
+                                           max="{{ date('Y-m-d') }}" 
+                                           required>
                                 </div>
-                                
                                 <div class="col-12">
                                     <label class="form-label fw-semibold">
                                         <i class="fas fa-comment me-2 text-muted"></i>
@@ -148,14 +171,65 @@
     .custom-tabs .nav-link.active i {
         color: white !important;
     }
-    
-    
+
+    .toast {
+        z-index: 99999 !important;
+        min-width: 300px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .2);
+        border-radius: 8px;
+    }
+
+    .toast-success {
+        border-left: 4px solid #28a745;
+    }
+
+    .toast-error {
+        border-left: 4px solid #dc3545;
+    }
+
+    .toast-warning {
+        border-left: 4px solid #ffc107;
+    }
+
 </style>
 @endpush
 
 @push('scripts')
 <script>
 $(document).ready(function() {
+    function mostrarToast(mensaje, tipo = 'success', errores = null) {
+        const toast = $('#toastNotificacion');
+        const toastMensaje = $('#toastMensaje');
+        const toastErrores = $('#toastErrores');
+        const toastListaErrores = $('#toastListaErrores');
+        
+        toastMensaje.html('');
+        toastListaErrores.empty();
+        toastErrores.hide();
+        toast.removeClass('toast-success toast-error toast-warning');
+        
+        if (tipo === 'success') {
+            toast.addClass('toast-success');
+            toastMensaje.html(`<i class="fas fa-check-circle me-2 text-success"></i>${mensaje}`);
+        } else if (tipo === 'error') {
+            toast.addClass('toast-error');
+            toastMensaje.html(`<i class="fas fa-times-circle me-2 text-danger"></i>${mensaje}`);
+        } else {
+            toast.addClass('toast-warning');
+            toastMensaje.html(`<i class="fas fa-exclamation-triangle me-2 text-warning"></i>${mensaje}`);
+        }
+        
+        if (errores && errores.length > 0) {
+            toastErrores.show();
+            errores.forEach(error => {
+                toastListaErrores.append(`<li><i class="fas fa-exclamation-circle me-2 text-danger"></i>${error}</li>`);
+            });
+        }
+        
+        const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 5000 });
+        bsToast.show();
+    }
+
     $('.select2-empleado').select2({
         placeholder: "Buscar empleado...",
         allowClear: true,
@@ -171,6 +245,7 @@ $(document).ready(function() {
         allowClear: true,
         width: '100%'
     });
+    
     $('#traspasoTabs').on('shown.bs.tab', function(e) {
         $('.select2-empleado, .select2-departamento, .select2-edificio').each(function() {
             if (!$(this).data('select2')) {
@@ -196,17 +271,19 @@ $(document).ready(function() {
                 if (response.success) {
                     let mensaje = `✓ Se traspasaron ${response.procesados} activos correctamente.`;
                     if (response.fallidos > 0) {
-                        mensaje += `\n\n ${response.fallidos} activos no se pudieron traspasar:\n${response.errores.join('\n')}`;
+                        mensaje = `⚠️ Procesado parcialmente: ${response.procesados} exitosos, ${response.fallidos} fallidos.`;
+                        mostrarToast(mensaje, 'warning', response.errores);
+                    } else {
+                        mostrarToast(mensaje, 'success');
                     }
-                    alert(mensaje);
-                    location.reload();
+                    setTimeout(() => location.reload(), 2000);
                 } else {
-                    alert('Error: ' + (response.message || 'Error al procesar el traspaso'));
+                    mostrarToast(response.message || 'Error al procesar el traspaso', 'error');
                 }
             },
             error: function(xhr) {
                 let errorMsg = xhr.responseJSON?.message || 'Error al procesar el traspaso múltiple';
-                alert('Error: ' + errorMsg);
+                mostrarToast(errorMsg, 'error');
             },
             complete: function() {
                 $('#btnConfirmarTraspasoMultiple').prop('disabled', false).html('<i class="fas fa-check me-2"></i>Confirmar traspaso');
@@ -215,10 +292,10 @@ $(document).ready(function() {
         });
     }
     
-        $('#btnConfirmarTraspasoMultiple').click(function() {
+    $('#btnConfirmarTraspasoMultiple').click(function() {
         let motivo = $('#modalMotivoTraspaso').val();
         if (!motivo.trim()) {
-            alert('Debe ingresar un motivo para el traspaso');
+            mostrarToast('Debe ingresar un motivo para el traspaso', 'warning');
             return;
         }
 

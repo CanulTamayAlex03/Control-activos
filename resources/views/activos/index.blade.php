@@ -5,13 +5,23 @@
     <div class="row align-items-center mb-2 mx-0">
         <div class="col-md-8 px-0">
             <div class="d-flex gap-2">
-                <form action="{{ route('activos.index') }}" method="GET" class="d-flex flex-grow-1">
-                    <input type="text"
-                        name="search"
-                        class="form-control form-control-sm rounded-0 rounded-start"
-                        placeholder="Buscar por folio o número de inventario..."
-                        value="{{ request('search') }}"
-                        id="search-input">
+                <form action="{{ route('activos.index') }}" method="GET" id="formBusquedaPrincipal" class="d-flex flex-grow-1">
+                    <div style="flex: 1; min-width: 200px;">
+                        <select class="form-select form-select-sm" 
+                                id="buscarActivoPrincipal" 
+                                name="search"
+                                style="width: 100%;">
+                            @if(request('search') && $activo)
+                                <option value="{{ $activo->numero_inventario }}" selected>
+                                    {{ $activo->numero_inventario }} - {{ $activo->descripcion_corta }}
+                                </option>
+                            @elseif(request('search') && request('search') != $activo?->numero_inventario)
+                                <option value="{{ request('search') }}" selected>
+                                    {{ request('search') }}
+                                </option>
+                            @endif
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-sm btn-primary rounded-0 rounded-end">
                         <i class="fas fa-search"></i>
                     </button>
@@ -265,15 +275,15 @@
                                 <span class="info-value">{{ $activo->numero_pedido ?: '-' }}</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Entrada Almacén:</span>
-                                <span class="info-value">
-                                    {{ $activo->entrada_almacen ? $activo->entrada_almacen->format('d/m/Y') : '-' }}
-                                </span>
-                            </div>
-                            <div class="info-row">
                                 <span class="info-label">Folio Entrada:</span>
                                 <span class="info-value">
                                     {{ $activo->folio_entrada ?: '-' }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Entrada Almacén:</span>
+                                <span class="info-value">
+                                    {{ $activo->entrada_almacen ? $activo->entrada_almacen->format('d/m/Y') : '-' }}
                                 </span>
                             </div>
                             <div class="info-row">

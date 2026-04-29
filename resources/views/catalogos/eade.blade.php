@@ -37,12 +37,13 @@
                         @endif
                     </div>
                 </form>
-
+                @can('crear eade')
                 <button class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#addEadeModal">
                     <i class="bi bi-plus-circle me-1"></i> Nuevo EADE
                 </button>
+                @endcan
             </div>
 
             <div class="table-responsive">
@@ -70,6 +71,7 @@
                             </td>
                             <td class="text-start">
                                 <div class="btn-group btn-group-sm">
+                                    @can('editar eade')
                                     <button class="btn btn-warning px-3 btn-edit"
                                             title="Editar"
                                             data-id="{{ $eade->id }}"
@@ -77,6 +79,7 @@
                                             data-active="{{ $eade->trashed() ? 0 : 1 }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

@@ -20,6 +20,8 @@ class HistorialTraspaso extends Model
         'edificio_id',
         'fecha_traspaso',
         'motivo_traspaso',
+        'grupo_traspaso_id',
+        'usuario_email',
     ];
 
     protected $casts = [

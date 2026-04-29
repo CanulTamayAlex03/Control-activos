@@ -17,7 +17,6 @@
                 </p>
 
                 <div class="row g-3">
-                    <!-- Card Bienes Muebles -->
                     <div class="col-md-4">
                         <a href="/activos/create/BM" class="text-decoration-none">
                             <div class="card h-100 border-0 shadow-sm hover-card">
@@ -31,7 +30,6 @@
                         </a>
                     </div>
 
-                    <!-- Card Bienes Vehiculares -->
                     <div class="col-md-4">
                         <a href="/activos/create/BV" class="text-decoration-none">
                             <div class="card h-100 border-0 shadow-sm hover-card">
@@ -45,7 +43,6 @@
                         </a>
                     </div>
 
-                    <!-- Card Bienes Vehiculares Arrendados -->
                     <div class="col-md-4">
                         <a href="/activos/create/BVA" class="text-decoration-none">
                             <div class="card h-100 border-0 shadow-sm hover-card">

@@ -34,14 +34,10 @@
             line-height: 1.5;
         }
 
-
-
         .logo img {
             width: 140px;
             height: auto;
         }
-
-
 
         .titulo h1 {
             font-size: 14px;

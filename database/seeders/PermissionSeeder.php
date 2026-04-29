@@ -16,13 +16,78 @@ class PermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permisos = [
-            // Activos
+            // ===== ACTIVOS FIJO =====
+            'administrar activos',
             'ver activos',
             'crear activos',
             'editar activos',
-            'eliminar activos',
-            'importar activos',
-            'exportar activos',
+
+            // Movimientos
+            'administrar movimientos',
+            'traspasos individuales',
+            'traspasos multiples',
+            'bajas individuales',
+            'bajas multiples',
+            
+            'ver tipos activo',
+            'crear tipos activo',
+            'editar tipos activo',
+            
+            'ver status activos',
+            'crear status activos',
+            'editar status activos',
+            
+            'ver reportes activos',
+
+            // ===== HERRAMIENTA MENOR =====
+            'administrar herramienta',
+            'ver herramienta',
+            'crear herramienta',
+            'editar herramienta',
+            
+            'ver tipos herramienta',
+            'crear tipos herramienta',
+            'editar tipos herramienta',
+            
+            'ver status herramienta',
+            'crear status herramienta',
+            'editar status herramienta',
+            
+            'ver reportes herramienta',
+
+            // ===== CATÁLOGOS =====
+            'administrar catalogos',
+            'ver parametros',
+            'crear parametros',
+            'editar parametros',
+            
+            'ver edificios',
+            'crear edificios',
+            'editar edificios',
+            
+            'ver departamentos',
+            'crear departamentos',
+            'editar departamentos',
+            
+            'ver direcciones',
+            'crear direcciones',
+            'editar direcciones',
+            
+            'ver empleados',
+            'crear empleados',
+            'editar empleados',
+            
+            'ver eade',
+            'crear eade',
+            'editar eade',
+            
+            'ver ubr',
+            'crear ubr',
+            'editar ubr',
+            
+            'ver proveedores',
+            'crear proveedores',
+            'editar proveedores',
 
             // Usuarios
             'ver usuarios',
@@ -49,12 +114,10 @@ class PermissionSeeder extends Seeder
 
         $admin->syncPermissions([
             // Activos
+            'administrar activos',
             'ver activos',
             'crear activos',
             'editar activos',
-            'eliminar activos',
-            'importar activos',
-            'exportar activos',
 
             // Usuarios
             'ver usuarios',

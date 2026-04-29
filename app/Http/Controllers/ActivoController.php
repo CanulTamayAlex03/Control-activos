@@ -15,6 +15,7 @@ use App\Models\CatalogoDirecciones;
 use App\Models\CatalogoUbr;
 use App\Models\CatalogoEade;
 use App\Models\Parametro;
+use App\Models\HistorialBaja;
 use App\Models\HistorialTraspaso;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -49,7 +50,9 @@ class ActivoController extends Controller
                             $query->where('folio', $searchTerm);
                         }
                         $query->orWhere('numero_inventario', 'LIKE', "%{$searchTerm}%")
-                            ->orWhere('descripcion_corta', 'LIKE', "%{$searchTerm}%");
+                            ->orWhere('descripcion_corta', 'LIKE', "%{$searchTerm}%")
+                            ->orWhere('numero_pedido', 'LIKE', "%{$searchTerm}%")
+                            ->orWhere('folio_entrada', 'LIKE', "%{$searchTerm}%");
                     });
                 }
 
@@ -388,6 +391,39 @@ class ActivoController extends Controller
         try {
             $search = $request->get('search');
 
+            if ($request->has('search')) {
+                if (empty($search)) {
+                    return response()->json(['results' => []]);
+                }
+
+                $activos = Activo::with(['empleado', 'departamento'])
+                    ->where('numero_inventario', 'LIKE', "%{$search}%")
+                    ->orWhere('descripcion_corta', 'LIKE', "%{$search}%")
+                    ->orWhere('descripcion_larga', 'LIKE', "%{$search}%")
+                    ->orWhere('numero_serie', 'LIKE', "%{$search}%")
+                    ->orWhere('marca', 'LIKE', "%{$search}%")
+                    ->orWhere('modelo', 'LIKE', "%{$search}%")
+                    ->orWhere('numero_pedido', 'LIKE', "%{$search}%")
+                    ->orWhere('folio_entrada', 'LIKE', "%{$search}%")
+                    ->orderBy('numero_inventario', 'asc')
+                    ->limit(20)
+                    ->get();
+
+                return response()->json([
+                    'results' => $activos->map(function ($activo) {
+                        return [
+                            'id' => $activo->numero_inventario,
+                            'text' => $activo->numero_inventario . ' - ' . $activo->descripcion_corta,
+                            'descripcion' => $activo->descripcion_corta,
+                            'empleado' => $activo->empleado?->nombre ?? $activo->empleado_old ?? 'Sin asignar',
+                            'departamento' => $activo->departamento?->descripcion ?? 'No asignado',
+                            'numero_pedido' => $activo->numero_pedido ?? 'S/P',
+                            'folio_entrada' => $activo->folio_entrada ?? 'S/F'
+                        ];
+                    })
+                ]);
+            }
+
             if (empty($search)) {
                 return redirect()->route('activos.index');
             }
@@ -398,17 +434,22 @@ class ActivoController extends Controller
                 ->orWhere('numero_serie', 'LIKE', "%{$search}%")
                 ->orWhere('marca', 'LIKE', "%{$search}%")
                 ->orWhere('modelo', 'LIKE', "%{$search}%")
+                ->orWhere('numero_pedido', 'LIKE', "%{$search}%")
+                ->orWhere('folio_entrada', 'LIKE', "%{$search}%")
                 ->orderBy('folio', 'asc')
                 ->limit(50)
                 ->get();
 
             return view('activos.search', compact('activos', 'search'));
         } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['results' => [], 'error' => $e->getMessage()]);
+            }
+
             return redirect()->route('activos.index')
-                ->with('error', 'Error en la búsqueda');
+                ->with('error', 'Error en la búsqueda: ' . $e->getMessage());
         }
     }
-
     public function getSubrubrosPorRubro($rubroId)
     {
         try {
@@ -620,7 +661,7 @@ class ActivoController extends Controller
     {
         $request->validate([
             'numero_inventario' => 'required|exists:activos,numero_inventario',
-            'fecha_baja' => 'required|date',
+            'fecha_baja' => 'required|date|before_or_equal:today',
             'motivo_baja' => 'required|string|max:255',
             'recibido_por' => 'required|string|max:255',
         ]);
@@ -631,19 +672,45 @@ class ActivoController extends Controller
             return back()->with('error', 'Este activo ya está dado de baja.');
         }
 
-        $activo->update([
-            'fecha_baja' => $request->fecha_baja,
-            'motivo_baja' => $request->motivo_baja,
-            'estado_bien_id' => 2
-        ]);
+        DB::beginTransaction();
 
-        return response()->json([
-            'success' => true,
-            'pdf_url' => route('activos.print.formato_baja', [
-                'folio' => $activo->folio,
-                'recibido_por' => strtoupper($request->recibido_por)
-            ])
-        ]);
+        try {
+            $usuarioEmail = auth()->user()->email;
+
+            HistorialBaja::create([
+                'activo_id' => $activo->folio,
+                'empleado_id' => $activo->empleado_id,
+                'departamento_id' => $activo->departamento_id,
+                'edificio_id' => $activo->edificio_id,
+                'fecha_baja' => $request->fecha_baja,
+                'motivo_baja' => $request->motivo_baja,
+                'grupo_baja_id' => null,
+                'usuario_email' => $usuarioEmail,
+            ]);
+
+            $activo->update([
+                'fecha_baja' => $request->fecha_baja,
+                'motivo_baja' => $request->motivo_baja,
+                'estado_bien_id' => 2,
+                'status' => 0,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'pdf_url' => route('activos.print.formato_baja', [
+                    'folio' => $activo->folio,
+                    'recibido_por' => strtoupper($request->recibido_por)
+                ])
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al dar de baja: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function printFormatoBaja(Request $request, $folio)
@@ -724,6 +791,7 @@ class ActivoController extends Controller
             $empleadoAnteriorId = $activo->empleado_id;
             $departamentoAnteriorId = $activo->departamento_id;
             $edificioAnteriorId = $activo->edificio_id;
+            $usuarioEmail = auth()->user()->email;
 
             \App\Models\HistorialTraspaso::create([
                 'activo_id' => $activo->folio,
@@ -734,6 +802,8 @@ class ActivoController extends Controller
                 'edificio_id' => $request->edificio_id,
                 'fecha_traspaso' => $request->fecha_traspaso,
                 'motivo_traspaso' => $request->motivo_traspaso,
+                'grupo_traspaso_id' => null,
+                'usuario_email' => $usuarioEmail,
             ]);
 
             $activo->update([
@@ -761,6 +831,133 @@ class ActivoController extends Controller
                 'message' => $e->getMessage()
             ], 400);
         }
+    }
+
+    public function historialTraspasos(Request $request)
+    {
+        $tipo = $request->get('tipo', 'BM');
+        $query = HistorialTraspaso::with([
+            'activo',
+            'empleadoOrigen',
+            'empleadoDestino',
+            'departamentoOrigen',
+            'departamentoDestino'
+        ]);
+        $query->whereHas('activo', function ($q) use ($tipo) {
+            $q->where('numero_inventario', 'like', $tipo . '%');
+        });
+        $traspasos = $query->orderBy('fecha_traspaso', 'desc')
+            ->paginate(20);
+        return view('activos.historial-traspasos', compact('traspasos', 'tipo'));
+    }
+
+    public function verFormatoTraspasoHistorial($traspasoId)
+    {
+        $traspaso = HistorialTraspaso::with([
+            'activo.proveedor',
+            'activo.estadoBien',
+            'empleadoOrigen',
+            'empleadoDestino',
+            'departamentoOrigen',
+            'departamentoDestino',
+            'edificio'
+        ])->findOrFail($traspasoId);
+        $activo = $traspaso->activo;
+        $activo->fecha_traspaso = $traspaso->fecha_traspaso;
+        $activo->motivo_traspaso = $traspaso->motivo_traspaso;
+        $empleadoOrigen = $traspaso->empleadoOrigen;
+        $empleadoDestino = $traspaso->empleadoDestino;
+        $departamentoOrigen = $traspaso->departamentoOrigen;
+        $departamentoDestino = $traspaso->departamentoDestino;
+        $edificioDestino = $traspaso->edificio;
+        $elaboro = Parametro::find(1);
+        $vobo = Parametro::find(3);
+        $autorizo = Parametro::find(2);
+
+        $pdf = Pdf::loadView('activos.print.formato_traspaso', compact(
+            'activo',
+            'elaboro',
+            'vobo',
+            'autorizo',
+            'empleadoOrigen',
+            'empleadoDestino',
+            'departamentoOrigen',
+            'departamentoDestino',
+            'edificioDestino'
+        ))->setPaper('letter', 'portrait');
+        return $pdf->stream('traspaso_' . $activo->numero_inventario . '_' . $traspaso->fecha_traspaso . '.pdf');
+    }
+
+    public function getHistorialTraspasosByActivo($folio)
+    {
+        $traspasos = HistorialTraspaso::with([
+            'activo',
+            'empleadoOrigen',
+            'empleadoDestino',
+            'departamentoOrigen',
+            'departamentoDestino'
+        ])->where('activo_id', $folio)
+            ->orderBy('fecha_traspaso', 'desc')
+            ->get();
+        return response()->json([
+            'traspasos' => $traspasos->map(function ($traspaso) {
+                return [
+                    'id' => $traspaso->id,
+                    'fecha' => $traspaso->fecha_traspaso->format('d/m/Y'),
+                    'empleado_origen' => $traspaso->empleadoOrigen->nombre ?? 'SIN ASIGNAR',
+                    'empleado_destino' => $traspaso->empleadoDestino->nombre ?? 'N/D',
+                    'departamento_origen' => $traspaso->departamentoOrigen->descripcion ?? 'SIN ASIGNAR',
+                    'departamento_destino' => $traspaso->departamentoDestino->descripcion ?? 'N/D',
+                    'motivo' => $traspaso->motivo_traspaso,
+                    'pdf_url' => route('activos.traspasos.historial.pdf', $traspaso->id)
+                ];
+            })
+        ]);
+    }
+
+    public function historialMovimientos()
+    {
+        return view('activos.reportes.historial-movimientos');
+    }
+
+
+    public function generarHistorialMovimientos(Request $request)
+    {
+        $request->validate([
+            'numero_inventario' => 'required|string'
+        ]);
+
+        $activo = Activo::where('numero_inventario', $request->numero_inventario)->first();
+
+        if (!$activo) {
+            return back()->with('error', 'No se encontró un activo con ese número de inventario');
+        }
+
+        $traspasos = HistorialTraspaso::where('activo_id', $activo->folio)
+            ->with(['empleadoOrigen', 'empleadoDestino', 'departamentoOrigen', 'departamentoDestino'])
+            ->orderBy('fecha_traspaso', 'DESC')
+            ->get();
+
+        $movimientos = collect();
+
+        
+
+        foreach ($traspasos as $traspaso) {
+            $movimientos->push((object)[
+                'fecha' => $traspaso->fecha_traspaso,
+                'origen' => $traspaso->departamentoOrigen->descripcion ?? 'N/D',
+                'destino' => $traspaso->departamentoDestino->descripcion ?? 'N/D',
+                'serie' => $activo->numero_serie ?? 'S/N SERIE',
+                'observaciones' => $traspaso->motivo_traspaso ?? 'SIN COMENTARIOS',
+                'origen_clave' => $traspaso->departamentoOrigen->clave ?? '-',
+                'destino_clave' => $traspaso->departamentoDestino->clave ?? '-'
+            ]);
+        }
+
+        $pdf = Pdf::loadView('activos.print.historial-movimientos', compact('activo', 'movimientos'));
+        $pdf->setPaper('letter', 'portrait');
+
+        return $pdf->stream('historial_' . $activo->numero_inventario . '.pdf');
     }
 
     public function printFormatoTraspaso(Request $request, $folio)
@@ -877,27 +1074,6 @@ class ActivoController extends Controller
             'motivo_traspaso' => 'required|string|max:600',
         ]);
 
-        $destinoId = $request->destino_id;
-
-        if ($request->destino_tipo === 'empleado') {
-            $empleadoDestino = CatalogoEmpleado::with('edificio')->findOrFail($destinoId);
-            $departamentoId = $empleadoDestino->id_depto;
-            $empleadoId = $destinoId;
-            $edificioId = $empleadoDestino->id_edif;
-        } else {
-            $departamentoDestino = CatalogoDepartamento::with('edificio')->findOrFail($destinoId);
-            $departamentoId = $destinoId;
-            $empleadoId = null;
-            $edificioId = $departamentoDestino->id_edif;
-        }
-
-        $activosIds = explode(',', $request->activos_ids);
-        $activosIds = array_unique(array_filter($activosIds));
-
-        if (empty($activosIds)) {
-            return response()->json(['success' => false, 'message' => 'No hay activos seleccionados'], 400);
-        }
-
         DB::beginTransaction();
 
         $procesados = 0;
@@ -905,6 +1081,32 @@ class ActivoController extends Controller
         $errores = [];
 
         try {
+            $usuarioEmail = auth()->user()->email;
+
+            $ultimoGrupo = HistorialTraspaso::max('grupo_traspaso_id') ?? 0;
+            $nuevoGrupoId = $ultimoGrupo + 1;
+
+            $destinoId = $request->destino_id;
+
+            if ($request->destino_tipo === 'empleado') {
+                $empleadoDestino = CatalogoEmpleado::with('edificio')->findOrFail($destinoId);
+                $departamentoId = $empleadoDestino->id_depto;
+                $empleadoId = $destinoId;
+                $edificioId = $empleadoDestino->id_edif;
+            } else {
+                $departamentoDestino = CatalogoDepartamento::with('edificio')->findOrFail($destinoId);
+                $departamentoId = $destinoId;
+                $empleadoId = null;
+                $edificioId = $departamentoDestino->id_edif;
+            }
+
+            $activosIds = explode(',', $request->activos_ids);
+            $activosIds = array_unique(array_filter($activosIds));
+
+            if (empty($activosIds)) {
+                return response()->json(['success' => false, 'message' => 'No hay activos seleccionados'], 400);
+            }
+
             foreach ($activosIds as $folio) {
                 try {
                     $activo = Activo::findOrFail($folio);
@@ -931,6 +1133,8 @@ class ActivoController extends Controller
                         'edificio_id' => $edificioId,
                         'fecha_traspaso' => $request->fecha_traspaso,
                         'motivo_traspaso' => $request->motivo_traspaso,
+                        'grupo_traspaso_id' => $nuevoGrupoId,
+                        'usuario_email' => $usuarioEmail,
                     ]);
 
                     $activo->update([
@@ -959,6 +1163,8 @@ class ActivoController extends Controller
                 'procesados' => $procesados,
                 'fallidos' => $fallidos,
                 'errores' => $errores,
+                'grupo_traspaso_id' => $nuevoGrupoId,
+                'message' => "Traspaso múltiple completado. Grupo ID: {$nuevoGrupoId}"
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -969,7 +1175,9 @@ class ActivoController extends Controller
     public function getEmpleadoInfo($id)
     {
         $empleado = CatalogoEmpleado::with(['departamento', 'edificio'])
-            ->withCount('activos')
+            ->withCount(['activos' => function ($query) {
+                $query->whereNull('fecha_baja');
+            }])
             ->findOrFail($id);
 
         return response()->json([
@@ -977,5 +1185,146 @@ class ActivoController extends Controller
             'edificio' => $empleado->edificio->descripcion ?? 'Sin edificio',
             'activos_count' => $empleado->activos_count
         ]);
+    }
+
+    public function bajasMultiplesIndex()
+    {
+        $empleados = CatalogoEmpleado::with(['departamento', 'edificio'])
+            ->withCount(['activos' => function ($query) {
+                $query->whereNull('fecha_baja')->where('status', 1);
+            }])
+            ->orderBy('nombre')
+            ->get();
+        $departamentos = CatalogoDepartamento::withCount(['activos' => function ($query) {
+            $query->whereNull('fecha_baja')->where('status', 1);
+        }])
+            ->orderBy('descripcion')
+            ->get();
+
+        return view('activos.activo-bajas-multiples', compact('empleados', 'departamentos'));
+    }
+
+    public function getActivosParaBaja(Request $request)
+    {
+        $tipo = $request->get('tipo');
+        $id = $request->get('id');
+
+        if ($tipo === 'empleado') {
+            $activos = Activo::with(['empleado', 'departamento', 'edificio'])
+                ->where('empleado_id', $id)
+                ->whereNull('fecha_baja')
+                ->where('status', true)
+                ->get();
+        } else {
+            $activos = Activo::with(['empleado', 'departamento', 'edificio'])
+                ->where('departamento_id', $id)
+                ->whereNull('fecha_baja')
+                ->where('status', true)
+                ->get();
+        }
+
+        return response()->json($activos->map(function ($activo) {
+            return [
+                'folio' => $activo->folio,
+                'numero_inventario' => $activo->numero_inventario,
+                'descripcion_corta' => $activo->descripcion_corta,
+                'costo' => $activo->costo,
+                'fecha_adquisicion' => $activo->fecha_adquisicion,
+                'empleado_nombre' => $activo->empleado?->nombre,
+                'departamento_descripcion' => $activo->departamento?->descripcion,
+                'edificio_descripcion' => $activo->edificio?->descripcion,
+            ];
+        }));
+    }
+
+    public function bajasMultiplesStore(Request $request)
+    {
+        $request->validate([
+            'activos_ids' => 'required|string',
+            'origen_tipo' => 'required|in:empleado,departamento',
+            'origen_id' => 'required|integer',
+            'fecha_baja' => 'required|date|before_or_equal:today',
+            'motivo_baja' => 'required|string|max:600',
+        ]);
+
+        $activosIds = explode(',', $request->activos_ids);
+        $activosIds = array_unique(array_filter($activosIds));
+
+        if (empty($activosIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No hay activos seleccionados'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+
+        $procesados = 0;
+        $fallidos = 0;
+        $errores = [];
+
+        $usuarioEmail = auth()->user()->email;
+
+        $ultimoGrupo = HistorialBaja::max('grupo_baja_id') ?? 0;
+        $grupoBajaId = $ultimoGrupo + 1;
+
+        try {
+            foreach ($activosIds as $folio) {
+                try {
+                    $activo = Activo::findOrFail($folio);
+
+                    if ($activo->fecha_baja) {
+                        throw new \Exception("{$activo->numero_inventario}: Ya está dado de baja");
+                    }
+
+                    if ($request->origen_tipo === 'empleado' && $activo->empleado_id != $request->origen_id) {
+                        throw new \Exception("{$activo->numero_inventario}: No pertenece al empleado seleccionado");
+                    }
+                    if ($request->origen_tipo === 'departamento' && $activo->departamento_id != $request->origen_id) {
+                        throw new \Exception("{$activo->numero_inventario}: No pertenece al departamento seleccionado");
+                    }
+
+                    HistorialBaja::create([
+                        'activo_id' => $activo->folio,
+                        'empleado_id' => $activo->empleado_id,
+                        'departamento_id' => $activo->departamento_id,
+                        'edificio_id' => $activo->edificio_id,
+                        'fecha_baja' => $request->fecha_baja,
+                        'motivo_baja' => $request->motivo_baja,
+                        'grupo_baja_id' => $grupoBajaId,
+                        'usuario_email' => $usuarioEmail,
+                    ]);
+
+                    $activo->update([
+                        'fecha_baja' => $request->fecha_baja,
+                        'motivo_baja' => $request->motivo_baja,
+                        'estado_bien_id' => 2,
+                        'status' => 0,
+                    ]);
+
+                    $procesados++;
+                } catch (\Exception $e) {
+                    $fallidos++;
+                    $errores[] = $e->getMessage();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'procesados' => $procesados,
+                'fallidos' => $fallidos,
+                'errores' => $errores,
+                'grupo_baja_id' => $grupoBajaId,
+                'message' => "Se procesaron {$procesados} activos. Fallidos: {$fallidos}"
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar las bajas: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

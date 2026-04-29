@@ -31,9 +31,11 @@
                         @endif
                     </div>
                 </form>
+                @can('crear parametros')
                 <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addParametroModal">
                     <i class="bi bi-plus-circle me-1"></i> Nuevo parámetro
                 </button>
+                @endcan
             </div>
 
             <div class="table-responsive">
@@ -63,9 +65,10 @@
                                 @else
                                 <span class="badge bg-success">Activo</span>
                                 @endif
-                            </td>
+                            </td>                      
                             <td class="text-start">
                                 <div class="btn-group btn-group-sm" role="group">
+                                    @can ('editar parametros')
                                     <button class="btn btn-warning px-3 btn-edit"
                                         title="Editar"
                                         data-id="{{ $parametro->id }}"
@@ -76,6 +79,7 @@
                                         data-active="{{ $parametro->trashed() ? 0 : 1 }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

@@ -374,18 +374,6 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="info-row">
-                                    <label class="info-label" for="entrada_almacen">Entrada Almacén:</label>
-                                    <div class="info-value">
-                                        <input type="date" 
-                                               name="entrada_almacen" 
-                                               id="entrada_almacen"
-                                               class="form-control form-control-sm"
-                                               value="{{ old('entrada_almacen', $activo->entrada_almacen ? $activo->entrada_almacen->format('Y-m-d') : '') }}">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="info-row">
                                     <label class="info-label" for="folio_entrada">Folio Entrada:</label>
                                     <div class="info-value">
                                         <input type="text" 
@@ -394,6 +382,18 @@
                                                class="form-control form-control-sm"
                                                value="{{ old('folio_entrada', $activo->folio_entrada) }}"
                                                placeholder="Ej: FE-2024-001">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-row">
+                                    <label class="info-label" for="entrada_almacen">Entrada Almacén:</label>
+                                    <div class="info-value">
+                                        <input type="date" 
+                                               name="entrada_almacen" 
+                                               id="entrada_almacen"
+                                               class="form-control form-control-sm"
+                                               value="{{ old('entrada_almacen', $activo->entrada_almacen ? $activo->entrada_almacen->format('Y-m-d') : '') }}">
                                     </div>
                                 </div>
                             </div>

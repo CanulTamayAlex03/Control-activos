@@ -31,6 +31,7 @@
                     <i class="fas fa-home me-2"></i> Inicio
                 </a>
 
+                @can('administrar activos')
                 <a id="toggleActivos"
                    class="d-flex justify-content-between align-items-center"
                    href="javascript:void(0);">
@@ -39,26 +40,37 @@
                     </span>
                     <i class="fas fa-chevron-down small" id="iconActivos"></i>
                 </a>
-
          
                 <div id="menuActivos" style="font-size: 15px;">
+                    @can('ver activos')
                     <a href="{{ route('activos.index') }}" class="ps-4 d-block">
                         <i class="fas fa-box me-2"></i> Activo
                     </a>
+                    @endcan
+                    @can('administrar movimientos')
                     <a href="{{ route('activos.traspasos.index') }}" class="ps-4 d-block">
                         <i class="fas fa-rotate me-2"></i> Movimientos
                     </a>
+                    @endcan
+                    @can('ver tipos activo')
                     <a href="{{ route('activos.activos_tipos') }}" class="ps-4 d-block">
                         <i class="fas fa-tags me-2"></i> Tipos de Activo
                     </a>
+                    @endcan
+                    @can('ver status activos')
                     <a href="{{ route('activos.activos_estatus') }}" class="ps-4 d-block">
                         <i class="fas fa-toggle-off me-2"></i> Estatus Activos
                     </a>
+                    @endcan
+                    @can('ver reportes activos')
                     <a href="{{ route('activos.activos_reportes') }}" class="ps-4 d-block">
                         <i class="fas fa-chart-bar me-2"></i> Reportes de Activo Fijo
                     </a>
+                    @endcan
                 </div>
+                @endcan
 
+                @can('administrar herramienta')
                 <a id="toggleHerramienta"
                    class="d-flex justify-content-between align-items-center"
                    href="javascript:void(0);">
@@ -69,20 +81,30 @@
                 </a>
 
                 <div id="menuHerramienta" style="font-size: 15px;">
+                    @can('ver herramienta')
                     <a href="{{ route('herramienta-menor.index') }}" class="ps-4 d-block">
                         <i class="fas fa-tools me-2"></i> Herramienta Menor
                     </a>
+                    @endcan
+                    @can('ver tipos herramienta')
                     <a href="{{ route('herramienta-menor.tipos') }}" class="ps-4 d-block">
                         <i class="fas fa-tags me-2"></i> Tipos de Herramienta
                     </a>
+                    @endcan
+                    @can('ver status herramienta')
                     <a href="{{ route('herramienta-menor.estatus') }}" class="ps-4 d-block">
                         <i class="fas fa-toggle-off me-2"></i> Estatus Herramienta
                     </a>
+                    @endcan
+                    @can('ver reportes herramienta')
                     <a href="{{ route('herramienta-menor.reportes') }}" class="ps-4 d-block">
                         <i class="fas fa-chart-bar me-2"></i> Reportes Herramienta 
                     </a>
+                    @endcan
                 </div>
+                @endcan
 
+                @can('administrar catalogos')
                 <a id="toggleCatalogos"
                    class="d-flex justify-content-between align-items-center"
                    href="javascript:void(0);">
@@ -93,31 +115,48 @@
                 </a>
                 
                 <div id="menuCatalogos" style="font-size: 15px;">
+                    @can('ver parametros')
                     <a href="{{ route('catalogos.parametros-firmas') }}" class="ps-4 d-block">
                         <i class="fas fa-signature me-2"></i> Parámetros de firmas
                     </a>
+                    @endcan
+                    @can('ver edificios')
                     <a href="{{ route('catalogos.edificios') }}" class="ps-4 d-block">
                         <i class="fas fa-building me-2"></i> Edificios
                     </a>
+                    @endcan
+                    @can('ver departamentos')
                     <a href="{{ route('catalogos.departamentos') }}" class="ps-4 d-block">
                         <i class="fas fa-sitemap me-2"></i> Departamentos
                     </a>
+                    @endcan
+                    @can('ver direcciones')
                     <a href="{{ route('catalogos.direcciones') }}" class="ps-4 d-block">
                         <i class="fas fa-city me-2"></i> Direcciones
                     </a>
+                    @endcan
+                    @can('ver empleados')
                     <a href="{{ route('catalogos.empleados') }}" class="ps-4 d-block">
                         <i class="fas fa-user-tie me-2"></i> Empleados
                     </a>
+                    @endcan
+                    @can('ver eade')
                     <a href="{{ route('catalogos.eade') }}" class="ps-4 d-block">
                         <i class="fas fa-utensils me-2"></i> Espacios de A. y D.
                     </a>
+                    @endcan
+                    @can('ver ubr')
                     <a href="{{ route('catalogos.ubr') }}" class="ps-4 d-block">
                         <i class="fas fa-heartbeat me-2"></i> UBR
                     </a>
+                    @endcan
+                    @can('ver proveedores')
                     <a href="{{ route('catalogos.proveedores') }}" class="ps-4 d-block">
                         <i class="fas fa-truck me-2"></i> Proveedores
                     </a>
+                    @endcan
                 </div>
+                @endcan
 
                 @canany(['ver usuarios', 'ver permisos'])
                 <div class="mt-3 mb-2 px-3">

@@ -31,9 +31,11 @@
                         @endif
                     </div>
                 </form>
+                @can('crear edificios')
                 <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addEdificioModal">
                     <i class="bi bi-plus-circle me-1"></i> Nuevo edificio
                 </button>
+                @endcan
             </div>
 
             <div class="table-responsive">
@@ -60,6 +62,7 @@
                             </td>
                             <td class="text-start">
                                 <div class="btn-group btn-group-sm" role="group">
+                                    @can('editar edificios')
                                     <button class="btn btn-warning px-3 btn-edit"
                                         title="Editar"
                                         data-id="{{ $edificio->id }}"
@@ -67,6 +70,7 @@
                                         data-active="{{ $edificio->trashed() ? 0 : 1 }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

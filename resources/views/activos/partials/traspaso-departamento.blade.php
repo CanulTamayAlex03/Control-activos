@@ -25,7 +25,6 @@
                     </select>
                 </div>
 
-                <!-- Información del departamento origen -->
                 <div id="infoDepartamentoOrigen" class="mt-3 p-3 bg-light rounded">
                     <div class="d-flex justify-content-between gap-3">
                         <div class="flex-grow-1">
@@ -78,7 +77,6 @@
                     </select>
                 </div>
 
-                <!-- Información del departamento destino -->
                 <div id="infoDepartamentoDestino" class="mt-3 p-3 bg-light rounded">
                     <div class="d-flex justify-content-between gap-3">
                         <div class="flex-grow-1">
@@ -173,6 +171,7 @@
         </div>
     </div>
 </div>
+
 <style>
 .list-group-item.selected {
     background-color: #e7f1ff;
@@ -188,6 +187,45 @@
 </style>
 
 <script>
+function mostrarToast(mensaje, tipo = 'success', errores = null) {
+    const toast = $('#toastNotificacion');
+    const toastMensaje = $('#toastMensaje');
+    const toastErrores = $('#toastErrores');
+    const toastListaErrores = $('#toastListaErrores');
+    
+    toast.css('z-index', '99999');
+    
+    toastMensaje.html('');
+    toastListaErrores.empty();
+    toastErrores.hide();
+    toast.removeClass('toast-success toast-error toast-warning');
+    
+    if (tipo === 'success') {
+        toast.addClass('toast-success');
+        toastMensaje.html(`<i class="fas fa-check-circle me-2 text-success"></i>${mensaje}`);
+    } else if (tipo === 'error') {
+        toast.addClass('toast-error');
+        toastMensaje.html(`<i class="fas fa-times-circle me-2 text-danger"></i>${mensaje}`);
+    } else {
+        toast.addClass('toast-warning');
+        toastMensaje.html(`<i class="fas fa-exclamation-triangle me-2 text-warning"></i>${mensaje}`);
+    }
+    
+    if (errores && errores.length > 0) {
+        toastErrores.show();
+        errores.forEach(error => {
+            toastListaErrores.append(`<li><i class="fas fa-exclamation-circle me-2 text-danger"></i>${error}</li>`);
+        });
+    }
+    
+    const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 5000 });
+    bsToast.show();
+    
+    setTimeout(() => {
+        toast.css('z-index', '');
+    }, 6000);
+}
+
 function waitForjQuery(callback) {
     if (window.jQuery) {
         callback(window.jQuery);
@@ -205,7 +243,6 @@ waitForjQuery(function($) {
         let activosOriginalesDepartamento = [];
         let filtroActivoDepartamento = '';
         
-        // Función para cargar información del departamento origen
         function cargarInfoDepartamentoOrigen() {
             let selected = $('#departamentoOrigen option:selected');
             let descripcion = selected.data('descripcion') || '—';
@@ -215,7 +252,6 @@ waitForjQuery(function($) {
             $('#origenActivosCount').text(activosCount);
         }
         
-        // Función para cargar información del departamento destino
         function cargarInfoDepartamentoDestino() {
             let selected = $('#departamentoDestino option:selected');
             let descripcion = selected.data('descripcion') || '—';
@@ -225,35 +261,29 @@ waitForjQuery(function($) {
             $('#destinoActivosCount').text(activosCount);
         }
         
-        // ========== FUNCIÓN DE FILTRADO ==========
         function filtrarActivosDepartamento() {
             let textoFiltro = $('#buscadorActivosDepartamento').val().toLowerCase().trim();
             filtroActivoDepartamento = textoFiltro;
 
             if (!textoFiltro) {
-                // Si no hay filtro, mostrar todos
                 renderizarListaActivosDepartamento(activosOriginalesDepartamento);
                 $('#resultadoBusquedaDepartamento').hide();
                 return;
             }
 
-            // Filtrar activos
             let activosFiltrados = activosOriginalesDepartamento.filter(activo => {
                 return activo.numero_inventario.toLowerCase().includes(textoFiltro) ||
                     (activo.descripcion_corta && activo.descripcion_corta.toLowerCase().includes(textoFiltro)) ||
                     (activo.numero_serie && activo.numero_serie.toLowerCase().includes(textoFiltro));
             });
 
-            // Mostrar resultados filtrados
             renderizarListaActivosDepartamento(activosFiltrados);
 
-            // Mostrar contador de filtrados
             $('#resultadoBusquedaDepartamento').show();
             $('#filtradosCountDepartamento').text(activosFiltrados.length);
             $('#totalFiltradosDepartamento').text(activosOriginalesDepartamento.length);
         }
         
-        // ========== EVENTOS ORIGEN ==========
         $('#departamentoOrigen').on('change', function() {
             cargarInfoDepartamentoOrigen();
             let val = $(this).val();
@@ -264,7 +294,6 @@ waitForjQuery(function($) {
                 activosSeleccionadosDepartamento.clear();
                 activosOriginalesDepartamento = [];
                 renderizarListaActivosDepartamento([]);
-                // Limpiar buscador
                 $('#buscadorActivosDepartamento').val('');
                 $('#resultadoBusquedaDepartamento').hide();
             }
@@ -284,7 +313,6 @@ waitForjQuery(function($) {
             renderizarListaActivosDepartamento([]);
         });
         
-        // ========== EVENTOS DESTINO ==========
         $('#departamentoDestino').on('change', function() {
             cargarInfoDepartamentoDestino();
             let val = $(this).val();
@@ -310,7 +338,6 @@ waitForjQuery(function($) {
             $('#mensajeSinDestinoDepartamento').show();
         });
         
-        // ========== EVENTOS DEL BUSCADOR ==========
         $('#buscadorActivosDepartamento').on('keyup', function() {
             filtrarActivosDepartamento();
         });
@@ -320,7 +347,6 @@ waitForjQuery(function($) {
             filtrarActivosDepartamento();
         });
         
-        // ========== CARGAR ACTIVOS ==========
         $('#btnCargarActivosDepartamento').click(function() {
             let deptoId = $('#departamentoOrigen').val();
             if (!deptoId) return;
@@ -337,19 +363,17 @@ waitForjQuery(function($) {
                     $('#origenTipoInputDepartamento').val('departamento');
                     $('#origenIdInputDepartamento').val(deptoId);
                     
-                    // Limpiar buscador
                     $('#buscadorActivosDepartamento').val('');
                     $('#resultadoBusquedaDepartamento').hide();
                 })
                 .fail(function() {
-                    alert('Error al cargar los activos del departamento');
+                    mostrarToast('Error al cargar los activos del departamento', 'error');
                 })
                 .always(function() {
                     $('#btnCargarActivosDepartamento').html('<i class="fas fa-search me-2"></i>Cargar activos del departamento').prop('disabled', false);
                 });
         });
         
-        // ========== RENDERIZAR LISTA DE ACTIVOS ==========
         function renderizarListaActivosDepartamento(activos) {
             let container = $('#listaActivosDepartamento');
             container.empty();
@@ -401,7 +425,6 @@ waitForjQuery(function($) {
                 let parent = $(this).closest('.list-group-item');
                 
                 if ($(this).is(':checked')) {
-                    // Buscar el activo en la lista ORIGINAL (no en la filtrada)
                     let activo = activosOriginalesDepartamento.find(a => a.folio === id);
                     if (activo) {
                         activosSeleccionadosDepartamento.set(id, activo);
@@ -414,16 +437,13 @@ waitForjQuery(function($) {
                 
                 actualizarContadoresDepartamento();
                 
-                // Actualizar el estado del checkbox "seleccionar todos" (solo para los visibles)
                 let checkboxesVisibles = $('.activo-checkbox-departamento:visible');
                 let checkedCheckboxes = checkboxesVisibles.filter(':checked');
                 $('#seleccionarTodosDepartamento').prop('checked', checkboxesVisibles.length === checkedCheckboxes.length && checkboxesVisibles.length > 0);
             });
             
-            // Evento para "seleccionar todos" (SOLO los visibles)
             $('#seleccionarTodosDepartamento').off('change').on('change', function() {
                 let isChecked = $(this).is(':checked');
-                // Solo seleccionar los checkboxes visibles (los que están filtrados)
                 $('.activo-checkbox-departamento:visible').each(function() {
                     if ($(this).prop('checked') !== isChecked) {
                         $(this).prop('checked', isChecked).trigger('change');
@@ -446,37 +466,33 @@ waitForjQuery(function($) {
             }
         }
         
-        // ========== ABRIR MODAL CON CONFIGURACIÓN ==========
         $('#btnRealizarTraspasoMultipleDepartamento').click(function() {
             let origenId = $('#departamentoOrigen').val();
             let destinoId = $('#departamentoDestino').val();
             
             if (!origenId) {
-                alert('Por favor seleccione un departamento origen y cargue sus activos');
+                mostrarToast('Por favor seleccione un departamento origen y cargue sus activos', 'warning');
                 return;
             }
             if (!destinoId) {
-                alert('Por favor seleccione un departamento destino');
+                mostrarToast('Por favor seleccione un departamento destino', 'warning');
                 return;
             }
             if (activosSeleccionadosDepartamento.size === 0) {
-                alert('Por favor seleccione al menos un activo para traspasar');
+                mostrarToast('Por favor seleccione al menos un activo para traspasar', 'warning');
                 return;
             }
             
-            // Preparar datos para el modal
             let origenNombre = $('#departamentoOrigen option:selected').data('descripcion');
             let destinoNombre = $('#departamentoDestino option:selected').data('descripcion');
             let totalActivos = activosSeleccionadosDepartamento.size;
             
-            // Generar resumen
             let resumenHtml = `
                 <p><strong>Origen:</strong> ${origenNombre}</p>
                 <p><strong>Destino:</strong> ${destinoNombre}</p>
                 <p><strong>Total activos:</strong> ${totalActivos}</p>
             `;
             
-            // Llenar el modal
             $('#resumenTraspaso').html(resumenHtml);
             $('#modalActivosIds').val(Array.from(activosSeleccionadosDepartamento.keys()).join(','));
             $('#modalOrigenTipo').val('departamento');
@@ -486,7 +502,6 @@ waitForjQuery(function($) {
             $('#modalFechaTraspaso').val(new Date().toISOString().split('T')[0]);
             $('#modalMotivoTraspaso').val('');
             
-            // Resetear y configurar Select2 en el modal
             setTimeout(function() {
                 if ($('#modalEdificioId').data('select2')) {
                     $('#modalEdificioId').select2('destroy');
@@ -499,11 +514,9 @@ waitForjQuery(function($) {
                 });
             }, 100);
             
-            // Mostrar modal
             $('#modalConfirmarTraspasoMultiple').modal('show');
         });
         
-        // Inicializar
         cargarInfoDepartamentoOrigen();
         cargarInfoDepartamentoDestino();
     });

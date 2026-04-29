@@ -43,8 +43,30 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/bajas', [ActivoController::class, 'bajasIndex'])->name('bajas.index');
         Route::post('/bajas', [ActivoController::class, 'darDeBaja'])->name('bajas.store');
 
+        Route::get('/bajas/multiples', [ActivoController::class, 'bajasMultiplesIndex'])
+            ->name('bajas.multiples.index');
+        Route::get('/bajas/multiples/activos', [ActivoController::class, 'getActivosParaBaja'])
+            ->name('bajas.multiples.activos');
+        Route::post('/bajas/multiples', [ActivoController::class, 'bajasMultiplesStore'])
+            ->name('bajas.multiples.store');
+
         Route::get('/traspasos', [ActivoController::class, 'traspasosIndex'])->name('traspasos.index');
         Route::post('/traspasos', [ActivoController::class, 'darTraspaso'])->name('traspasos.store');
+
+        Route::get('/traspasos/historial', [ActivoController::class, 'historialTraspasos'])
+            ->name('traspasos.historial');
+
+        Route::get('/traspasos/historial/{traspasoId}/pdf', [ActivoController::class, 'verFormatoTraspasoHistorial'])
+            ->name('traspasos.historial.pdf');
+
+        Route::get('/traspasos/activo/{folio}/historial', [ActivoController::class, 'getHistorialTraspasosByActivo'])
+            ->name('traspasos.activo.historial');
+
+        // Para formato de lista de traspasos por BM
+        Route::get('/reportes/historial-movimientos', [ActivoController::class, 'historialMovimientos'])
+            ->name('reportes.historial_movimientos');
+        Route::post('/reportes/historial-movimientos', [ActivoController::class, 'generarHistorialMovimientos'])
+            ->name('reportes.generar_historial');
 
         Route::get('/search', [ActivoController::class, 'search'])->name('search');
 

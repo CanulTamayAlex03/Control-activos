@@ -32,9 +32,11 @@
                     </div>
                 </form>
                 <div class="d-flex gap-2">
+                    @can('crear proveedores')
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addProveedorModal">
                         <i class="bi bi-plus-circle me-1"></i> Nuevo proveedor
                     </button>
+                    @endcan
                 </div>
             </div>
 
@@ -72,6 +74,7 @@
                             </td>
                             <td class="text-start">
                                 <div class="btn-group btn-group-sm" role="group">
+                                    @can('editar proveedores')
                                     <button class="btn btn-warning px-3 btn-edit"
                                         title="Editar"
                                         data-id="{{ $proveedor->id }}"
@@ -91,6 +94,7 @@
                                         data-active="{{ $proveedor->trashed() ? 0 : 1 }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

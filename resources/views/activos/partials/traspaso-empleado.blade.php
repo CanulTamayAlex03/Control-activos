@@ -28,7 +28,6 @@
                     </select>
                 </div>
 
-                <!-- Información del empleado origen -->
                 <div id="infoEmpleadoOrigen" class="mt-3 p-3 bg-light rounded">
                     <div class="d-flex justify-content-between gap-3">
                         <div class="flex-grow-1">
@@ -203,6 +202,45 @@
 </style>
 
 <script>
+    function mostrarToast(mensaje, tipo = 'success', errores = null) {
+        const toast = $('#toastNotificacion');
+        const toastMensaje = $('#toastMensaje');
+        const toastErrores = $('#toastErrores');
+        const toastListaErrores = $('#toastListaErrores');
+        
+        toast.css('z-index', '99999');
+        
+        toastMensaje.html('');
+        toastListaErrores.empty();
+        toastErrores.hide();
+        toast.removeClass('toast-success toast-error toast-warning');
+        
+        if (tipo === 'success') {
+            toast.addClass('toast-success');
+            toastMensaje.html(`<i class="fas fa-check-circle me-2 text-success"></i>${mensaje}`);
+        } else if (tipo === 'error') {
+            toast.addClass('toast-error');
+            toastMensaje.html(`<i class="fas fa-times-circle me-2 text-danger"></i>${mensaje}`);
+        } else {
+            toast.addClass('toast-warning');
+            toastMensaje.html(`<i class="fas fa-exclamation-triangle me-2 text-warning"></i>${mensaje}`);
+        }
+        
+        if (errores && errores.length > 0) {
+            toastErrores.show();
+            errores.forEach(error => {
+                toastListaErrores.append(`<li><i class="fas fa-exclamation-circle me-2 text-danger"></i>${error}</li>`);
+            });
+        }
+        
+        const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 5000 });
+        bsToast.show();
+        
+        setTimeout(() => {
+            toast.css('z-index', '');
+        }, 6000);
+    }
+
     function waitForjQuery(callback) {
         if (window.jQuery) {
             callback(window.jQuery);
@@ -220,7 +258,6 @@
             let activosOriginalesEmpleado = [];
             let filtroActivoEmpleado = '';
 
-            // Función para cargar información del empleado vía AJAX
             function cargarInfoEmpleado(empleadoId, tipo) {
                 if (!empleadoId) {
                     if (tipo === 'origen') {
@@ -252,39 +289,33 @@
                         console.log('Destino cargado:', data);
                     }
                 }).fail(function() {
-                    console.error('Error cargando empleado:', empleadoId);
+                    mostrarToast('Error al cargar la información del empleado', 'error');
                 });
             }
 
-            // ========== FUNCIÓN DE FILTRADO (MOVIDA ANTES DE SER USADA) ==========
             function filtrarActivosEmpleado() {
                 let textoFiltro = $('#buscadorActivosEmpleado').val().toLowerCase().trim();
                 filtroActivoEmpleado = textoFiltro;
 
                 if (!textoFiltro) {
-                    // Si no hay filtro, mostrar todos
                     renderizarListaActivosEmpleado(activosOriginalesEmpleado);
                     $('#resultadoBusquedaEmpleado').hide();
                     return;
                 }
 
-                // Filtrar activos
                 let activosFiltrados = activosOriginalesEmpleado.filter(activo => {
                     return activo.numero_inventario.toLowerCase().includes(textoFiltro) ||
                         (activo.descripcion_corta && activo.descripcion_corta.toLowerCase().includes(textoFiltro)) ||
                         (activo.numero_serie && activo.numero_serie.toLowerCase().includes(textoFiltro));
                 });
 
-                // Mostrar resultados filtrados
                 renderizarListaActivosEmpleado(activosFiltrados);
 
-                // Mostrar contador de filtrados
                 $('#resultadoBusquedaEmpleado').show();
                 $('#filtradosCountEmpleado').text(activosFiltrados.length);
                 $('#totalFiltradosEmpleado').text(activosOriginalesEmpleado.length);
             }
 
-            // ========== EVENTOS ORIGEN ==========
             $('#empleadoOrigen').on('change', function() {
                 let empleadoId = $(this).val();
                 cargarInfoEmpleado(empleadoId, 'origen');
@@ -315,7 +346,6 @@
                 $('#panelConfiguracionEmpleado').hide();
             });
 
-            // ========== EVENTOS DESTINO ==========
             $('#empleadoDestino').on('change', function() {
                 cargarInfoEmpleado($(this).val(), 'destino');
             });
@@ -328,7 +358,6 @@
                 cargarInfoEmpleado(null, 'destino');
             });
 
-            // ========== CARGAR ACTIVOS ==========
             $('#btnCargarActivosEmpleado').click(function() {
                 let empleadoId = $('#empleadoOrigen').val();
                 if (!empleadoId) return;
@@ -341,27 +370,25 @@
                     })
                     .done(function(data) {
                         console.log('Activos cargados:', data.length);
-                        activosOriginalesEmpleado = data; // Guardar originales
+                        activosOriginalesEmpleado = data; 
                         activosOrigenEmpleado = data;
                         activosSeleccionadosEmpleado.clear();
                         renderizarListaActivosEmpleado(data);
                         $('#origenTipoInputEmpleado').val('empleado');
                         $('#origenIdInputEmpleado').val(empleadoId);
 
-                        // Limpiar buscador
                         $('#buscadorActivosEmpleado').val('');
                         $('#resultadoBusquedaEmpleado').hide();
                     })
                     .fail(function(xhr) {
                         console.error('Error:', xhr);
-                        alert('Error al cargar los activos del empleado');
+                        mostrarToast('Error al cargar los activos del empleado', 'error');
                     })
                     .always(function() {
                         $('#btnCargarActivosEmpleado').html('<i class="fas fa-search me-2"></i>Cargar activos del empleado').prop('disabled', false);
                     });
             });
 
-            // ========== EVENTOS DEL BUSCADOR (AHORA LA FUNCIÓN YA EXISTE) ==========
             $('#buscadorActivosEmpleado').on('keyup', function() {
                 filtrarActivosEmpleado();
             });
@@ -371,7 +398,6 @@
                 filtrarActivosEmpleado();
             });
 
-            // ========== RENDERIZAR LISTA ==========
             function renderizarListaActivosEmpleado(activos) {
                 let container = $('#listaActivosEmpleado');
                 container.empty();
@@ -419,13 +445,11 @@
 
                 actualizarContadoresEmpleado();
 
-                // Remover eventos anteriores y agregar nuevos
                 $('.activo-checkbox-empleado').off('change').on('change', function() {
                     let id = parseInt($(this).val());
                     let parent = $(this).closest('.list-group-item');
 
                     if ($(this).is(':checked')) {
-                        // Buscar el activo en la lista ORIGINAL (no en la filtrada)
                         let activo = activosOriginalesEmpleado.find(a => a.folio === id);
                         if (activo) {
                             activosSeleccionadosEmpleado.set(id, activo);
@@ -438,16 +462,13 @@
 
                     actualizarContadoresEmpleado();
 
-                    // Actualizar el estado del checkbox "seleccionar todos" (solo para los visibles)
                     let checkboxesVisibles = $('.activo-checkbox-empleado:visible');
                     let checkedCheckboxes = checkboxesVisibles.filter(':checked');
                     $('#seleccionarTodosEmpleado').prop('checked', checkboxesVisibles.length === checkedCheckboxes.length && checkboxesVisibles.length > 0);
                 });
 
-                // Evento para "seleccionar todos" (SOLO los visibles)
                 $('#seleccionarTodosEmpleado').off('change').on('change', function() {
                     let isChecked = $(this).is(':checked');
-                    // Solo seleccionar los checkboxes visibles (los que están filtrados)
                     $('.activo-checkbox-empleado:visible').each(function() {
                         if ($(this).prop('checked') !== isChecked) {
                             $(this).prop('checked', isChecked).trigger('change');
@@ -456,7 +477,6 @@
                 });
             }
 
-            // ========== ACTUALIZAR CONTADORES ==========
             function actualizarContadoresEmpleado() {
                 let total = activosSeleccionadosEmpleado.size;
                 $('#totalSeleccionadosEmpleado').text(total);
@@ -472,21 +492,20 @@
                 }
             }
 
-            // ========== ABRIR MODAL ==========
             $('#btnRealizarTraspasoMultipleEmpleado').click(function() {
                 let origenId = $('#empleadoOrigen').val();
                 let destinoId = $('#empleadoDestino').val();
 
                 if (!origenId) {
-                    alert('Por favor seleccione un empleado origen y cargue sus activos');
+                    mostrarToast('Por favor seleccione un empleado origen y cargue sus activos', 'warning');
                     return;
                 }
                 if (!destinoId) {
-                    alert('Por favor seleccione un empleado destino');
+                    mostrarToast('Por favor seleccione un empleado destino', 'warning');
                     return;
                 }
                 if (activosSeleccionadosEmpleado.size === 0) {
-                    alert('Por favor seleccione al menos un activo para traspasar');
+                    mostrarToast('Por favor seleccione al menos un activo para traspasar', 'warning');
                     return;
                 }
 

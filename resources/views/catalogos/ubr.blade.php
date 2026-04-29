@@ -20,12 +20,13 @@
                         <button class="btn btn-primary">Filtrar</button>
                     </div>
                 </form>
-
+                @can('crear ubr')
                 <button class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#addUbrModal">
                     <i class="bi bi-plus-circle me-1"></i> Nueva UBR
                 </button>
+                @endcan
             </div>
 
             <div class="table-responsive">
@@ -53,6 +54,7 @@
                                 @endif
                             </td>
                             <td>
+                                @can('editar ubr')
                                 <button class="btn btn-warning btn-sm btn-edit"
                                         data-id="{{ $ubr->id }}"
                                         data-descripcion="{{ $ubr->descripcion }}"
@@ -60,6 +62,7 @@
                                         data-active="{{ $ubr->trashed() ? 0 : 1 }}">
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
+                                @endcan
                             </td>
                         </tr>
                         @endforeach
