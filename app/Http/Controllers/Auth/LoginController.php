@@ -26,7 +26,7 @@ class LoginController extends Controller
 
             $user = auth()->user();
 
-            return redirect()->route('dashboard');
+            return redirect()->route('home');
         }
 
         return back()->withErrors([

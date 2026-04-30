@@ -185,7 +185,7 @@ class ActivoController extends Controller
                 'viewMode'
             ))->with('searchTerm', $searchTerm);
         } catch (\Exception $e) {
-            return redirect()->route('dashboard')
+            return redirect()->route('home')
                 ->with('error', 'Error al cargar los activos: ' . $e->getMessage());
         }
     }

@@ -10,6 +10,7 @@
 <div class="container-fluid px-4 pb-4">
 
     <div class="row g-4">
+        @can('ver activos')
         <div class="col-md-4 col-lg-3">
             <a href="{{ route('activos.index') }}" class="text-decoration-none">
                 <div class="card text-white bg-card h-100 shadow-sm dashboard-card">
@@ -20,7 +21,8 @@
                 </div>
             </a>
         </div>
-
+        @endcan
+        @can('ver herramienta')
         <div class="col-md-4 col-lg-3">
             <a href="{{ route('herramienta-menor.index') }}" class="text-decoration-none">
                 <div class="card text-white bg-card h-100 shadow-sm dashboard-card">
@@ -31,7 +33,7 @@
                 </div>
             </a>
         </div>
-
+        @endcan
         @can('ver usuarios')
         <div class="col-md-4 col-lg-3">
             <a href="{{ route('usuarios') }}" class="text-decoration-none">

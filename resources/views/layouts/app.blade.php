@@ -19,15 +19,19 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="d-flex">
+            @php
+                $isHerramientaMode = request()->routeIs('herramienta-menor.*');
+                $sidebarClass = $isHerramientaMode ? 'sidebar-herramienta' : '';
+                $navbarClass = $isHerramientaMode ? 'navbar-herramienta' : '';
+            @endphp
 
-        <div id="sidebar" class="sidebar d-flex flex-column justify-content-between">
-            <div>
+            <div id="sidebar" class="sidebar d-flex flex-column justify-content-between {{ $sidebarClass }}">            <div>
                 <div class="text-center border-bottom">
                     <img src="{{ asset('images/logodif.jpg') }}" alt="Logo" style="max-width: 100%; height: 65px;">
                 </div>
 
-                <a href="{{ route('dashboard') }}" 
-                    class="{{ request()->routeIs('dashboard') ? 'active-link' : '' }}">
+                <a href="{{ route('home') }}" 
+                    class="{{ request()->routeIs('home') ? 'active-link' : '' }}">
                     <i class="fas fa-home me-2"></i> Inicio
                 </a>
 
@@ -192,7 +196,7 @@
 
         <div class="content-wrapper" id="contentWrapper">
 
-            <nav class="navbar border-bottom px-4" id="navbar">
+            <nav class="navbar border-bottom px-4 {{ $navbarClass }}" id="navbar">
                 <div class="d-flex align-items-center gap-3">
                     <button id="toggleSidebar" class="btn btn-outline-secondary">
                         <i class="fas fa-bars"></i>

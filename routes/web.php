@@ -25,7 +25,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/home', [DashboardController::class, 'index'])->name('home');
 
     // ACTIVOS
     Route::prefix('activos')->name('activos.')->group(function () {

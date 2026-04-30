@@ -71,6 +71,29 @@ body {
     color: white;
 }
 
+/* Sidebar modo herramienta */
+.sidebar.sidebar-herramienta {
+    background: #69488E !important;
+}
+
+.sidebar.sidebar-herramienta a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar.sidebar-herramienta .active-link {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Navbar modo herramienta */
+.navbar.navbar-herramienta {
+    background: #471a7a !important; 
+}
+
+.navbar.navbar-herramienta .btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: #E81F76;
+}
+
 #menuActivos,
 #menuHerramienta,
 #menuCatalogos
